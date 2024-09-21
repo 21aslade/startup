@@ -10,7 +10,7 @@ Startup application for BYU CS 260.
 
 ### Elevator pitch
 
-Pyre is a competitive programming website where two programmers concurrently modify the same code in a race to outmaneuver each other and achieve their seperate objectives.
+LineBreak is a competitive programming website where two programmers concurrently modify the same code in a race to outmaneuver each other and achieve their seperate objectives.
 
 ### More details
 
