@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Showdown! - LineBreak</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="profile.html">Home</a>
+      </nav>
+    </header>
+    <main>
+      <section>
+        <pre>
+ ldr r0, [#0]
+ ldr r2, 1
+loop:
+ ldr r1, [r2]
+ add r0, r1
+ str [#0], r0
+ add r2, 1
+ bne loop
+ hlt</pre
+        >
+      </section>
+      <section>
+        <div>
+          <h3>Memory</h3>
+          <table>
+            <!-- In the real thing this will contain all 255 bytes of memory -->
+            <tr>
+              <td>6e</td>
+              <td>65</td>
+              <td>76</td>
+              <td>65</td>
+              <td>72</td>
+              <td>20</td>
+              <td>67</td>
+              <td>6f</td>
+              <td>6e</td>
+              <td>6e</td>
+              <td>61</td>
+              <td>20</td>
+              <td>67</td>
+              <td>69</td>
+              <td>76</td>
+              <td>65</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>79</td>
+              <td>6f</td>
+              <td>75</td>
+              <td>20</td>
+              <td>75</td>
+              <td>70</td>
+              <td>00</td>
+              <td>00</td>
+              <td>00</td>
+              <td>00</td>
+              <td>00</td>
+              <td>00</td>
+              <td>00</td>
+              <td>00</td>
+              <td>00</td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <h3>Registers</h3>
+          <table>
+            <tr>
+              <td>r0</td>
+              <td>00</td>
+            </tr>
+            <tr>
+              <td>r1</td>
+              <td>00</td>
+            </tr>
+            <!-- In the real thing, there will be 8 registers -->
+          </table>
+          <h4>Program Counter: 00</h4>
+        </div>
+      </section>
+      <footer>
+        <p>Opponent: ✅</p>
+        <button>Ready</button>
+        <button>Forfeit</button>
+        <p>[This bar requires WebSockets]</p>
+      </footer>
+    </main>
+    <aside>
+      <div>
+        <h2>Goal</h2>
+        <p>
+          Set every memory address (except [#0]) to the sum of all the memory
+          addresses before it (truncated to one byte), then halt
+        </p>
+      </div>
+      <div>
+        <h2>Documentation</h2>
+        <ul>
+          <li>
+            <span>ldr dest, [src]</span> - load the value contained at the
+            memory address specified by src into the register dest
+          </li>
+          <li>
+            <span>str [dest], src</span>
+            - store the value contained in the register src into the memory
+            address specified by dest
+          </li>
+          <li>
+            <span>add dest, a, b</span>
+            - set register dest to the sum of register a and value b. If there
+            are only two operands, dest is used instead of a
+          </li>
+        </ul>
+      </div>
+    </aside>
+    <footer></footer>
+  </body>
+</html>
