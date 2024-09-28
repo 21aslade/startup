@@ -26,13 +26,14 @@ This mockup shows the main code editor screen, the meat of the application. It's
 
 ## Technologies
 
-- HTML - Pages for signup, playing, and viewing challenge history.
-- CSS - Styling with good whitespace, color, etc (dark mode by default, obviously)
-- JavaScript - Interpreting/checking ChASM, handling syntax highlighting/etc (if I get to it), sending each player's updates back and forth.
-- React - SPA; reactively update views to match processor state and programmer input
-- Service - backend service with endpoints for:
-  - Beginning a new game
-  - Loading previous games
-  - Saving custom challenges
-- DB/Login - store users, custom challenges, games, and challenge history. To play a game against someone else (other than just practice) or create a custom challenge, users must authenticate (credentials stored securely)
-- WebSocket - as each user plays, their moves are sent to each other
+-   HTML - Pages for signup, playing, and viewing challenge history.
+-   CSS - Styling with good whitespace, color, etc (dark mode by default, obviously)
+-   JavaScript - Interpreting/checking ChASM, handling syntax highlighting/etc (if I get to it), sending each player's updates back and forth.
+-   React - SPA; reactively update views to match processor state and programmer input
+-   Service - backend service with endpoints for:
+    -   Beginning a new game
+    -   Loading previous games
+    -   Saving custom challenges
+-   External service - QR code generator for sharing replays!
+-   DB/Login - store users, custom challenges, games, and challenge history. To play a game against someone else (other than just practice) or create a custom challenge, users must authenticate (credentials stored securely)
+-   WebSocket - as each user plays, their moves are sent to each other
