@@ -1,5 +1,4 @@
-# startup
-
+![LineBreak](logo.png)
 Startup application for BYU CS 260.
 
 ## Quick Links
