@@ -37,3 +37,15 @@ This mockup shows the main code editor screen, the meat of the application. It's
 -   External service - QR code generator for sharing replays!
 -   DB/Login - store users, custom challenges, games, and challenge history. To play a game against someone else (other than just practice) or create a custom challenge, users must authenticate (credentials stored securely)
 -   WebSocket - as each user plays, their moves are sent to each other
+
+## Startup HTML
+
+For this deliverable I built out the structure of my application using HTML.
+
+-   [x] **HTML pages** - three HTML pages that represent a landing page, a profile page, and a play page
+-   [x] **Links** - the landing page has links to the profile page. The profile page and the play page link to each other and to the landing page
+-   [x] **Text** - Promotional text and documentation is interspersed throughout
+-   [x] **Images** - The LineBreak logo is displayed prominently on each page
+-   [x] **DB/Login** - Input box and submit button for login. The statistics represent data pulled from the database
+-   [x] **Third Party Service Calls** - A QR code is generated and displayed on the site. It's currently static, but it will be dynamic eventually.
+-   [x] **WebSockets** - Communication between the two opponents requires websockets
