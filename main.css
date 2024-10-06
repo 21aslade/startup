@@ -1,0 +1,55 @@
+:root {
+    --bg-zero: #282828;
+    --bg-code: #111111;
+    --text: #ffffff;
+    --button-hover: #3c3836;
+    --border: #08080833;
+
+    color: var(--text);
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-zero);
+    display: flex;
+    flex-direction: column;
+}
+
+textarea {
+    background-color: var(--bg-code);
+    color: var(--text);
+    resize: none;
+    border: none;
+}
+
+code {
+    display: inline-block;
+    background-color: var(--bg-code);
+    color: var(--text);
+    padding: 2px;
+    margin: 2px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+a {
+    color: #458588;
+}
+
+a:active,
+a:visited {
+    color: #d3869b;
+}
+
+button {
+    background-color: var(--bg-zero);
+    color: var(--text);
+    padding: 8px;
+    border: none;
+    font-size: 1.2rem;
+}
+
+button:hover {
+    background-color: var(--button-hover);
+}

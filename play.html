@@ -3,6 +3,7 @@
   <head>
     <title>Showdown! - LineBreak</title>
     <link rel="icon" href="icon.png" />
+    <link rel="stylesheet" href="main.css" />
   </head>
   <body>
     <header>
@@ -117,16 +118,16 @@ loop:
         <h2>Documentation</h2>
         <ul>
           <li>
-            <span>ldr dest, [src]</span> - load the value contained at the
+            <code>ldr dest, [src]</code> - load the value contained at the
             memory address specified by src into the register dest
           </li>
           <li>
-            <span>str [dest], src</span>
+            <code>str [dest], src</code>
             - store the value contained in the register src into the memory
             address specified by dest
           </li>
           <li>
-            <span>add dest, a, b</span>
+            <code>add dest, a, b</code>
             - set register dest to the sum of register a and value b. If there
             are only two operands, dest is used instead of a
           </li>
