@@ -14,6 +14,19 @@ body {
     background-color: var(--bg-zero);
     display: flex;
     flex-direction: column;
+    height: 100svh;
+}
+
+.main-header {
+    flex: 0 40px;
+}
+
+.main {
+    flex: 1;
+}
+
+.main-footer {
+    flex: 0 40px;
 }
 
 textarea {
