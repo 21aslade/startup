@@ -15,14 +15,17 @@ body {
     display: flex;
     flex-direction: column;
     height: 100svh;
+    margin: 0;
 }
 
 .main-header {
     flex: 0 40px;
+    display: flex;
 }
 
 .main {
     flex: 1;
+    display: flex;
 }
 
 .main-footer {
