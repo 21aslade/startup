@@ -21,6 +21,35 @@ body {
 .main-header {
     flex: 0 40px;
     display: flex;
+    align-items: center;
+}
+
+.main-logo {
+    height: fit-content;
+}
+
+.main-nav {
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.main-nav > a {
+    background-color: var(--bg-zero);
+    color: var(--text);
+    padding: 8px;
+    border: none;
+    font-size: 1.2rem;
+    text-decoration: none;
+}
+
+.main-nav > a:hover {
+    background-color: var(--button-hover);
+}
+
+.main-nav > a:visited {
+    color: var(--text);
 }
 
 .main {
