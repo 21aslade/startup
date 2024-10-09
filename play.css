@@ -9,6 +9,8 @@
 
     display: flex;
     flex-direction: column;
+
+    border-right: 1px solid var(--border);
 }
 
 .code {
@@ -17,29 +19,39 @@
 }
 
 .submit-bar {
-    flex: 0 40px;
+    flex: 0 56px;
     display: flex;
     flex-direction: row;
+    background-color: var(--bg-zero);
+    border-top: 1px solid var(--border);
 }
 
 .computer-section {
     flex: 1;
     height: 100%;
 
-    padding: 24px;
     display: flex;
     flex-direction: column;
+    border-right: 1px solid var(--border);
 }
 
 .computer {
     flex: 1;
+    padding: 24px;
 }
 
 .debugger {
-    flex: 0 40px;
+    flex: 0 56px;
+    background-color: var(--bg-zero);
+    border-top: 1px solid var(--border);
+
+    display: flex;
+    align-items: center;
 }
 
 .documentation {
     flex: 1;
     height: 100%;
+    background-color: var(--bg-zero);
+    padding: 24px;
 }

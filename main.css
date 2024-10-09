@@ -1,9 +1,10 @@
 :root {
+    --bg-code: #1d2021;
     --bg-zero: #282828;
-    --bg-code: #111111;
+    --bg-zero-s: #32302f;
     --text: #ffffff;
-    --button-hover: #3c3836;
-    --border: #08080833;
+    --button-hover: #ffffff11;
+    --border: #ffffff33;
 
     color: var(--text);
     font-family: sans-serif;
@@ -19,6 +20,9 @@ body {
 }
 
 .main-header {
+    background-color: var(--bg-zero-s);
+    border-bottom: 1px solid var(--border);
+
     flex: 0 40px;
     display: flex;
     align-items: center;
@@ -36,7 +40,7 @@ body {
 }
 
 .main-nav > a {
-    background-color: var(--bg-zero);
+    background-color: transparent;
     color: var(--text);
     padding: 8px;
     border: none;
@@ -54,10 +58,11 @@ body {
 
 .main {
     flex: 1;
-    display: flex;
 }
 
 .main-footer {
+    background-color: var(--bg-zero-s);
+    border-top: 1px solid var(--border);
     flex: 0 40px;
 }
 
@@ -88,7 +93,7 @@ a:visited {
 }
 
 button {
-    background-color: var(--bg-zero);
+    background-color: transparent;
     color: var(--text);
     padding: 8px;
     border: none;
