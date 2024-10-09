@@ -38,9 +38,28 @@ loop:
         <div class="computer">
           <div>
             <h3>Memory</h3>
-            <table>
-              <!-- In the real thing this will contain all 255 bytes of memory -->
+            <table class="memory-table">
+              <tr class="address-header">
+                <td></td>
+                <td class="address">&nbsp;0</td>
+                <td class="address">&nbsp;1</td>
+                <td class="address">&nbsp;2</td>
+                <td class="address">&nbsp;3</td>
+                <td class="address">&nbsp;4</td>
+                <td class="address">&nbsp;5</td>
+                <td class="address">&nbsp;6</td>
+                <td class="address">&nbsp;7</td>
+                <td class="address">&nbsp;8</td>
+                <td class="address">&nbsp;9</td>
+                <td class="address">&nbsp;a</td>
+                <td class="address">&nbsp;b</td>
+                <td class="address">&nbsp;c</td>
+                <td class="address">&nbsp;d</td>
+                <td class="address">&nbsp;e</td>
+                <td class="address">&nbsp;f</td>
+              </tr>
               <tr>
+                <td class="address">00</td>
                 <td>6e</td>
                 <td>65</td>
                 <td>76</td>
@@ -59,6 +78,7 @@ loop:
                 <td>65</td>
               </tr>
               <tr>
+                <td class="address">10</td>
                 <td>20</td>
                 <td>79</td>
                 <td>6f</td>
@@ -76,22 +96,309 @@ loop:
                 <td>00</td>
                 <td>00</td>
               </tr>
+              <tr>
+                <td class="address">20</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">30</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">40</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">50</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">60</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">70</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">80</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">90</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">a0</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">b0</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">c0</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">d0</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">e0</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">f0</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+                <td>00</td>
+              </tr>
             </table>
           </div>
           <div>
-            <h3>Registers</h3>
-            <table>
+            <table class="memory-table">
               <tr>
-                <td>r0</td>
+                <td class="address">r0</td>
                 <td>00</td>
               </tr>
               <tr>
-                <td>r1</td>
+                <td class="address">r1</td>
                 <td>00</td>
               </tr>
-              <!-- In the real thing, there will be 8 registers -->
+              <tr>
+                <td class="address">r2</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">r3</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">r4</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">r5</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">r6</td>
+                <td>00</td>
+              </tr>
+              <tr>
+                <td class="address">r7</td>
+                <td>00</td>
+              </tr>
             </table>
-            <h4>Program Counter: 00</h4>
           </div>
         </div>
         <footer class="debugger">
