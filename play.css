@@ -19,11 +19,29 @@
 }
 
 .submit-bar {
+    padding: 0 16px;
+
     flex: 0 56px;
+
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
     background-color: var(--bg-zero);
     border-top: 1px solid var(--border);
+}
+
+.ready {
+    background-color: #127800;
+}
+
+.ready:hover {
+    background-color: #169100;
+}
+
+.ready:active {
+    background-color: #189c00;
 }
 
 .computer-section {
