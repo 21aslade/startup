@@ -54,18 +54,24 @@
 
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     border-right: 1px solid var(--border);
 }
 
 .computer {
     flex: 1;
     padding: 24px;
-    height: 100%;
 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.memory-tables {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-around;
 }
 
 .memory-table {
@@ -83,6 +89,12 @@
 .address {
     font-weight: bold;
     color: var(--address);
+}
+
+.regs-flags {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .debugger {
