@@ -4,6 +4,7 @@
     --bg-zero-s: #32302f;
     --text: #ffffff;
     --button-hover: #ffffff11;
+    --button-click: #ffffff22;
     --border: #ffffff33;
 
     color: var(--text);
@@ -96,10 +97,18 @@ a:visited {
     color: var(--text);
 }
 
+.button:active {
+    color: var(--text);
+}
+
 .ghost-button {
     background-color: transparent;
 }
 
 .ghost-button:hover {
     background-color: var(--button-hover);
+}
+
+.ghost-button:active {
+    background-color: var(--button-click);
 }
