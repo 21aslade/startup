@@ -3,8 +3,11 @@
     --bg-zero: #282828;
     --bg-zero-s: #32302f;
     --text: #ffffff;
-    --button-hover: #ffffff11;
-    --button-click: #ffffff22;
+    --button-primary-bg: #637436;
+    --primary-hover: #788c41;
+    --primary-click: #8ea54d;
+    --ghost-hover: #ffffff11;
+    --ghost-click: #ffffff22;
     --border: #ffffff33;
 
     color: var(--text);
@@ -101,14 +104,42 @@ a:visited {
     color: var(--text);
 }
 
+.primary-button {
+    background-color: var(--button-primary-bg);
+}
+
+.primary-button:hover {
+    background-color: var(--primary-hover);
+}
+
+.primary-button:active {
+    background-color: var(--primary-click);
+}
+
+.secondary-button {
+    padding: 6px;
+    border: 2px solid var(--button-primary-bg);
+    background-color: transparent;
+}
+
+.secondary-button:hover {
+    background-color: var(--primary-hover);
+    border: 2px solid var(--primary-hover);
+}
+
+.secondary-button:active {
+    background-color: var(--primary-click);
+    border: 2px solid var(--primary-click);
+}
+
 .ghost-button {
     background-color: transparent;
 }
 
 .ghost-button:hover {
-    background-color: var(--button-hover);
+    background-color: var(--ghost-hover);
 }
 
 .ghost-button:active {
-    background-color: var(--button-click);
+    background-color: var(--ghost-click);
 }
