@@ -17,7 +17,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100svh;
-    width: fit-content;
+    min-width: fit-content;
     margin: 0;
 }
 
@@ -46,7 +46,7 @@ body {
 
 .main {
     flex: 1;
-    width: fit-content;
+    min-width: fit-content;
 }
 
 .main-footer {
