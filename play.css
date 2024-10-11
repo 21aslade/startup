@@ -79,6 +79,7 @@
     background-color: var(--bg-code);
     padding: 4px;
     margin: 8px;
+    border: 1px solid var(--border);
     border-radius: 4px;
 }
 
