@@ -78,6 +78,15 @@ code {
     border-radius: 4px;
 }
 
+.text-input {
+    color: var(--text);
+    background-color: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+}
+
 a {
     color: #458588;
 }

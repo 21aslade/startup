@@ -4,39 +4,65 @@
     <title>LineBreak</title>
     <link rel="icon" href="icon.png" />
     <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="index.css" />
   </head>
   <body>
     <header class="main-header">
-      <img src="logo.png" width="600px" alt="LineBreak logo" />
+      <a href="index.html"
+        ><img src="logo.png" width="100px" alt="LineBreak logo"
+      /></a>
+      <nav class="main-nav">
+        <a class="button ghost-button" href="profile.html">Profile</a>
+        <a class="button ghost-button" href="play.html">Start Match</a>
+      </nav>
     </header>
     <main class="main">
-      <section>
-        <h2>Put the "conflict" in "merge conflict"</h2>
-        <p>
-          In LineBreak, your opponent modifies the same code as you - at the
-          same time.
-        </p>
-        <h2>A true race condition</h2>
-        <p>The first player to meet their objective wins!</p>
-      </section>
-      <section>
-        <h3>Log In</h3>
-        <form method="get" action="profile.html">
-          <div>
-            <label>Username: </label>
-            <input type="text" autocomplete="username" />
+      <div class="content">
+        <header>
+          <img class="logo" src="logo.png" alt="LineBreak logo" />
+        </header>
+        <section>
+          <div class="promotion-a">
+            <h2>
+              Put the <code>conflict</code> in <code>merge conflict</code>
+            </h2>
+            <p>
+              In LineBreak, your opponent modifies the same code as you - at the
+              same time. You each get to insert one instruction per turn.
+            </p>
           </div>
-          <div>
-            <label>Password: </label>
-            <input type="password" autocomplete="current-password" />
+          <div class="promotion-b">
+            <h2>A true race condition</h2>
+            <p>
+              Work to outwit your opponent and meet your objective before they
+              can meet theirs. Whoever is first wins!
+            </p>
           </div>
+        </section>
+        <section class="login">
+          <form class="login-form" method="get" action="profile.html">
+            <input
+              class="text-input login-input"
+              type="text"
+              autocomplete="username"
+              aria-label="username"
+              placeholder="Username"
+            />
+            <input
+              class="text-input login-input"
+              type="password"
+              autocomplete="current-password"
+              aria-label="password"
+              placeholder="Password"
+            />
 
             <button class="button primary-button" type="submit">Login</button>
             <button class="button secondary-button" type="submit">
               Register
             </button>
-        </form>
-      </section>
+          </form>
+        </section>
+      </div>
     </main>
     <footer class="main-footer">
       <p>
