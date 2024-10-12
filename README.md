@@ -48,3 +48,13 @@ For this deliverable I built out the structure of my application using HTML.
 -   [x] **DB/Login** - Input box and submit button for login. The statistics represent data pulled from the database
 -   [x] **Third Party Service Calls** - A QR code is generated and displayed on the site. It's currently static, but it will be dynamic eventually.
 -   [x] **WebSockets** - Communication between the two opponents requires websockets
+
+## Startup CSS
+
+For this deliverable I styled the application to an approximation of its final appearance.
+
+-   [x] **Header, footer, and main content body**
+-   [x] **Navigation elements** - I only have a navbar and it's styled nicely
+-   [x] **Responsive to window resizing** - My app looks great on all window sizes (as long as they're reasonably wide)
+-   [x] **Application text content** - Consistent fonts
+-   [x] **Application images** - Images are appropriately sized and aligned
