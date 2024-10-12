@@ -1,71 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LineBreak</title>
-    <link rel="icon" href="icon.png" />
-    <link rel="stylesheet" href="main.css" />
-    <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <header class="main-header">
-      <a href="index.html"
-        ><img src="logo.png" width="100px" alt="LineBreak logo"
-      /></a>
-      <nav class="main-nav">
-        <a class="button ghost-button" href="profile.html">Profile</a>
-        <a class="button ghost-button" href="play.html">Start Match</a>
-      </nav>
-    </header>
-    <main class="main">
-      <section>
-        <img class="logo" src="logo.png" alt="LineBreak logo" />
-        <div class="promotion-a">
-          <h2>Put the <code>conflict</code> in <code>merge conflict</code></h2>
-          <p>
-            In LineBreak, your opponent modifies the same code as you - at the
-            same time. You each get to insert one instruction per turn.
-          </p>
-        </div>
-        <div class="promotion-b">
-          <h2>A true race condition</h2>
-          <p>
-            Work to outwit your opponent and meet your objective before they can
-            meet theirs. Whoever is first wins!
-          </p>
-        </div>
-      </section>
-      <section class="login">
-        <h2>Login</h2>
-        <form class="login-form" method="get" action="profile.html">
-          <input
-            class="text-input login-input"
-            type="text"
-            autocomplete="username"
-            aria-label="username"
-            placeholder="Username"
-          />
-          <input
-            class="text-input login-input"
-            type="password"
-            autocomplete="current-password"
-            aria-label="password"
-            placeholder="Password"
-          />
-
-          <button class="button primary-button" type="submit">Login</button
-          ><button class="button secondary-button" type="submit">
-            Register
-          </button>
-        </form>
-      </section>
-    </main>
-    <footer class="main-footer">
-      <p>
-        LineBreak was created by
-        <a href="https://github.com/21aslade">Andrew Slade</a> for BYU's CS 260.
-        View the source code on
-        <a href="https://github.com/21aslade/startup">GitHub</a>
-      </p>
-    </footer>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
