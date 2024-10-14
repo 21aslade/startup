@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { NavLink } from "react-router-dom";
 
 const buttonBaseStyles = `
@@ -17,9 +17,11 @@ const buttonBaseStyles = `
     &:active {
         color: var(--text);
     }
-`
+`;
 
-const ButtonBase = styled.button`${buttonBaseStyles}`;
+const ButtonBase = styled.button`
+    ${buttonBaseStyles}
+`;
 
 export const NavButton = styled(NavLink)`
     ${buttonBaseStyles};
@@ -27,10 +29,11 @@ export const NavButton = styled(NavLink)`
         background-color: var(--ghost-hover);
     }
 
-    &:active, &.active {
+    &:active,
+    &.active {
         background-color: var(--ghost-click);
     }
-`
+`;
 
 export const GhostButton = styled(ButtonBase)`
     &:hover {

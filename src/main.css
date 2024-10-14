@@ -9,6 +9,7 @@
     --ghost-hover: #ffffff11;
     --ghost-click: #ffffff22;
     --border: #ffffff33;
+    --address: #aaaaaa;
 
     color: var(--text);
     font-family: sans-serif;

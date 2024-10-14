@@ -1,7 +1,3 @@
-:root {
-    --address: #aaaaaa;
-}
-
 .main {
     display: flex;
     flex-direction: row;
@@ -36,18 +32,6 @@
     border-top: 1px solid var(--border);
 }
 
-.ready {
-    background-color: #127800;
-}
-
-.ready:hover {
-    background-color: #169100;
-}
-
-.ready:active {
-    background-color: #189c00;
-}
-
 .computer-section {
     flex: 1;
     height: 100%;
@@ -56,46 +40,6 @@
     flex-direction: column;
     justify-content: space-between;
     border-right: 1px solid var(--border);
-}
-
-.computer {
-    flex: 1;
-    padding: 24px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.memory-tables {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-}
-
-.memory-table {
-    font-family: "Courier New", Courier, monospace;
-    background-color: var(--bg-code);
-    padding: 4px;
-    margin: 8px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-}
-
-.address-header {
-    border-bottom: 1px solid var(--border);
-}
-
-.address {
-    font-weight: bold;
-    color: var(--address);
-}
-
-.regs-flags {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .debugger {
