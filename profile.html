@@ -1,83 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Profile - LineBreak</title>
-    <link rel="icon" href="icon.png" />
-    <link rel="stylesheet" href="main.css" />
-    <link rel="stylesheet" href="profile.css" />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LineBreak</title>
   </head>
   <body>
-    <header class="main-header">
-      <a href="index.html"
-        ><img src="logo.png" width="100px" alt="LineBreak logo"
-      /></a>
-      <nav class="main-nav">
-        <a class="button ghost-button" href="profile.html">Profile</a>
-        <a class="button ghost-button" href="play.html">Start Match</a>
-      </nav>
-    </header>
-    <main class="main">
-      <h1>宋力猴's Profile</h1>
-      <section class="profile-container">
-        <section class="profile">
-          <h2>Statistics</h2>
-          <p><b>Win percentage:</b> 97%</p>
-          <p><b>Games played:</b> 110</p>
-          <p><b>Games won:</b> 107</p>
-          <p><b>Games lost:</b> 3</p>
-          <p><b>Win percentage:</b> 97%</p>
-        </section>
-        <section class="friend-section">
-          <!-- This QR code will change per game. (Not quite sure how I'm gonna use it yet) -->
-          <div class="friend-code">
-            <h3>Friend Code:</h3>
-            <img
-              class="friend-qr"
-              src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fstartup.linebreak.click%2Fplay.html"
-            />
-          </div>
-          <div class="friend-requests">
-            <h3>Friend Requests</h3>
-            <div class="friend">
-              <a class="profile-name">Ralph Jung</a>
-              <div class="friend-request-buttons">
-                <button class="button primary-button small-button">
-                  Accept</button
-                ><button class="button secondary-button small-button">
-                  Reject
-                </button>
-              </div>
-            </div>
-            <div class="friend">
-              <a class="profile-name">jonhoo</a>
-              <div class="friend-request-buttons">
-                <button class="button primary-button small-button">
-                  Accept</button
-                ><button class="button secondary-button small-button">
-                  Reject
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="friends">
-            <h3>Friends</h3>
-            <div class="friend">
-              <a class="profile-name">Aria Bessinger</a>
-            </div>
-            <div class="friend">
-              <a class="profile-name">oli-obk</a>
-            </div>
-          </div>
-        </section>
-      </section>
-    </main>
-    <footer class="main-footer">
-      <p>
-        LineBreak was created by
-        <a href="https://github.com/21aslade">Andrew Slade</a> for BYU's CS 260.
-        View the source code on
-        <a href="https://github.com/21aslade/startup">GitHub</a>
-      </p>
-    </footer>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
