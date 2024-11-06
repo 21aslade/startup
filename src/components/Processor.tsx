@@ -53,7 +53,7 @@ function Memory({ memory }: MemoryProps) {
 
     const headers = range(memoryWidth)
         .map((i) => i.toString(16))
-        .map((s) => <Header>&nbsp;{s}</Header>);
+        .map((s) => <Header key={s}>&nbsp;{s}</Header>);
 
     const values = range(height).map((h) =>
         range(memoryWidth)
@@ -84,7 +84,7 @@ function Memory({ memory }: MemoryProps) {
 type RegisterProps = { registers: Uint8Array; _epoch: number };
 function Registers({ registers }: RegisterProps) {
     const rows = range(registers.length).map((i) => (
-        <tr>
+        <tr key={i}>
             <Header>r{i}</Header>
             <td>{toHexString(registers[i])}</td>
         </tr>
