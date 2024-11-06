@@ -3,6 +3,7 @@ import { Processor } from "../components/Processor.jsx";
 import { initializeProcessor } from "chasm/processor";
 import { useState } from "react";
 import Debugger from "../components/Debugger.jsx";
+import Editor from "../components/Editor.jsx";
 
 const processor = initializeProcessor();
 
@@ -50,7 +51,9 @@ export default function Play() {
 
     return (
         <FlexRow>
-            <ProcessorSection></ProcessorSection>
+            <ProcessorSection>
+                <Editor />
+            </ProcessorSection>
             <ProcessorSection>
                 <ProcessorWrapper>
                     <h2>Processor Status</h2>
