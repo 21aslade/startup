@@ -15,12 +15,14 @@ const EditorWrapper = styled.div`
     }
 `;
 
-function diagnosticSource(view: EditorView): Diagnostic[] {
-    const text = view.state.doc.toString();
+function getNextDiagnostic(
+    text: string,
+    offset: number
+): [string, Diagnostic] | undefined {
     const parseResult = parseFile(text);
 
     if (parseResult.isOk()) {
-        return [];
+        return undefined;
     }
 
     const error = parseResult.error;
@@ -28,16 +30,38 @@ function diagnosticSource(view: EditorView): Diagnostic[] {
     const remaining = text.substring(error.consumed);
     const match = /^\S*/.exec(remaining)?.[0] ?? "";
 
+    const currentLine = /^[^\n]*(\n|$)|/.exec(remaining)?.[0].length ?? 0;
+    const remainingLines = remaining.substring(currentLine);
+
     const expected = [...error.expected].map((s) => `"${s}"`).join(", ");
 
     return [
+        remainingLines,
         {
-            from: error.consumed,
-            to: error.consumed + match.length,
+            from: error.consumed + offset,
+            to: error.consumed + match.length + offset,
             severity: "error",
             message: `Parsing failed. Expected: ${expected}`,
         },
     ];
+}
+
+function diagnosticSource(view: EditorView): Diagnostic[] {
+    const initialText = view.state.doc.toString();
+    let text = initialText;
+    let diagnostics: Diagnostic[] = [];
+    do {
+        const next = getNextDiagnostic(text, initialText.length - text.length);
+        if (next !== undefined) {
+            const [remaining, diagnostic] = next;
+            text = remaining;
+            diagnostics.push(diagnostic);
+        } else {
+            text = "";
+        }
+    } while (text.length > 0);
+
+    return diagnostics;
 }
 
 const chasmLinter = linter(diagnosticSource);
