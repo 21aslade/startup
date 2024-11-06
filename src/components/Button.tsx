@@ -6,6 +6,7 @@ const buttonBaseStyles = `
     color: var(--text);
     padding: 8px;
     margin: 4px;
+    border: none;
     border-radius: 4px;
     font-size: 1.2rem;
     text-decoration: none;
@@ -36,6 +37,8 @@ export const NavButton = styled(NavLink)`
 `;
 
 export const GhostButton = styled(ButtonBase)`
+    background-color: transparent;
+
     &:hover {
         background-color: var(--ghost-hover);
     }
