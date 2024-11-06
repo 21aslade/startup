@@ -85,7 +85,7 @@ type RegisterProps = { registers: Uint8Array; _epoch: number };
 function Registers({ registers }: RegisterProps) {
     const rows = range(registers.length).map((i) => (
         <tr>
-            <td>r{i}</td>
+            <Header>r{i}</Header>
             <td>{toHexString(registers[i])}</td>
         </tr>
     ));
