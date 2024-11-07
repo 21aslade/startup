@@ -93,6 +93,7 @@ const initialState = {
     labels: new Map(),
     instructions: [],
     undo: [],
+    stepLimit: 20000,
     play: false,
 };
 
@@ -110,8 +111,7 @@ export default function Play() {
 
     const dispatchDebugger = (type: DebuggerCommandName) => {
         if (running) {
-            console.log("Running step");
-            console.log(state.instructions);
+            console.log(state.stepLimit);
             dispatch({ type });
             return;
         }
@@ -157,7 +157,10 @@ export default function Play() {
                     <h2>Processor Status</h2>
                     <Processor processor={state.processor} epoch={epoch} />
                     <h3>PC: {state.processor.pc}</h3>
-                    <h3>Step: {epoch}</h3>
+                    <h3>
+                        Step: {epoch} / {state.stepLimit}
+                    </h3>
+                    <progress max={state.stepLimit} value={epoch} />
                 </ProcessorWrapper>
                 <DebuggerWrapper>
                     <div>

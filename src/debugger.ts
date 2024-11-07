@@ -26,10 +26,14 @@ export type DebuggerState = {
     labels: Map<string, number>;
     instructions: Instruction[];
     undo: Effect[];
+    stepLimit: number;
     play: boolean;
 };
 
-export function dispatchState(state: DebuggerState, action: DebuggerCommand) {
+export function dispatchState(
+    state: DebuggerState,
+    action: DebuggerCommand
+): DebuggerState {
     switch (action.type) {
         case "step-in":
             return step(state);
@@ -54,6 +58,7 @@ export function dispatchState(state: DebuggerState, action: DebuggerCommand) {
                 instructions: [],
                 undo: [],
                 play: false,
+                stepLimit: state.stepLimit,
             };
         case "load-code":
             return {
@@ -67,7 +72,8 @@ export function dispatchState(state: DebuggerState, action: DebuggerCommand) {
 function canMoveForward(state: DebuggerState): boolean {
     return (
         !state.processor.halted &&
-        state.processor.pc < state.instructions.length
+        state.processor.pc < state.instructions.length &&
+        state.undo.length < state.stepLimit
     );
 }
 
@@ -90,6 +96,7 @@ function runInstruction(
         instructions: state.instructions,
         undo,
         play: state.play,
+        stepLimit: state.stepLimit,
     };
 }
 
@@ -122,8 +129,13 @@ function stepOut(state: DebuggerState): DebuggerState {
         return { ...state, play: false };
     }
 
-    let instruction = state.instructions[state.processor.pc];
+    if (state.processor.callStack.length === 0) {
+        return step(state);
+    }
+
+    let instruction;
     do {
+        instruction = state.instructions[state.processor.pc];
         if (instruction.op === "call") {
             state = stepOver(state);
         } else {
@@ -161,5 +173,6 @@ function unstep(state: DebuggerState): DebuggerState {
         instructions: state.instructions,
         undo: state.undo.slice(0, -1),
         play: state.play,
+        stepLimit: state.stepLimit,
     };
 }
