@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import CodeMirror from "@uiw/react-codemirror";
+import { useCallback, useMemo } from "react";
+import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror";
 import { gruvboxDarkInit } from "@uiw/codemirror-theme-gruvbox-dark";
 import { styled } from "styled-components";
 import { EditorView } from "@codemirror/view";
@@ -69,28 +69,48 @@ function diagnosticSource(view: EditorView): Diagnostic[] {
 const chasmLinter = linter(diagnosticSource);
 const extensions = [chasmLinter];
 
-export default function Editor() {
-    const [value, setValue] = useState("");
-    // @ts-ignore
-    const onChange = useCallback((val, viewUpdate) => {
-        setValue(val);
-    }, []);
+export type EditorProps = {
+    value: string;
+    readOnly: boolean;
+    onChange: (s: string) => void;
+};
+
+export default function Editor({
+    value,
+    onChange,
+    readOnly = false,
+}: EditorProps) {
+    const onEditorChange = useCallback(
+        (val: string, _viewUpdate: ViewUpdate) => {
+            onChange(val);
+        },
+        []
+    );
+
+    const textColor = readOnly ? "var(--address)" : "var(--text)";
+
+    const theme = useMemo(() => {
+        return gruvboxDarkInit({
+            settings: {
+                background: "#1d2021",
+                foreground: textColor,
+            },
+        });
+    }, [textColor]);
+
     return (
         <EditorWrapper>
             {/* @ts-expect-error */}
             <CodeMirror
+                readOnly={readOnly}
                 value={value}
                 height="100%"
-                theme={gruvboxDarkInit({
-                    settings: {
-                        background: "#1d2021",
-                    },
-                })}
+                theme={theme}
                 extensions={extensions}
                 options={{
                     viewportMargin: Infinity,
                 }}
-                onChange={onChange}
+                onChange={onEditorChange}
             />
         </EditorWrapper>
     );

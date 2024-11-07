@@ -1,3 +1,4 @@
+import { DebuggerCommandName } from "../debugger.js";
 import { GhostButton } from "./Button.jsx";
 import {
     Pause,
@@ -10,18 +11,8 @@ import {
     StepOver,
 } from "./Icons.jsx";
 
-export type DebuggerCommand =
-    | "step-over"
-    | "step-in"
-    | "step-out"
-    | "step-back"
-    | "play"
-    | "pause"
-    | "skip"
-    | "skip-back";
-
 export type DebuggerProps = {
-    dispatch: (d: DebuggerCommand) => void;
+    dispatch: (d: DebuggerCommandName) => void;
     play: boolean;
 };
 export default function Debugger({ dispatch, play }: DebuggerProps) {
