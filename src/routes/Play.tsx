@@ -14,11 +14,16 @@ const FlexRow = styled.section`
     height: 100%;
 `;
 
-const ProcessorSection = styled.section`
+const PlaySection = styled.section`
     flex: 1;
     display: flex;
     flex-direction: column;
     height: 100%;
+`;
+
+const MiddleSection = styled(PlaySection)`
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
 `;
 
 const DebuggerWrapper = styled.footer`
@@ -51,10 +56,10 @@ export default function Play() {
 
     return (
         <FlexRow>
-            <ProcessorSection>
+            <PlaySection>
                 <Editor />
-            </ProcessorSection>
-            <ProcessorSection>
+            </PlaySection>
+            <MiddleSection>
                 <ProcessorWrapper>
                     <h2>Processor Status</h2>
                     <Processor processor={state.processor} epoch={epoch} />
@@ -65,8 +70,8 @@ export default function Play() {
                 <DebuggerWrapper>
                     <Debugger dispatch={() => {}} play={state.play} />
                 </DebuggerWrapper>
-            </ProcessorSection>
-            <ProcessorSection></ProcessorSection>
+            </MiddleSection>
+            <PlaySection></PlaySection>
         </FlexRow>
     );
 }

@@ -8,6 +8,7 @@ import { parseFile } from "chasm/parser";
 
 const EditorWrapper = styled.div`
     height: 100%;
+    min-width: 300px;
     font-size: 1.2em;
 
     & > div {
