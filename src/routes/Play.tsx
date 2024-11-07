@@ -4,6 +4,8 @@ import { initializeProcessor } from "chasm/processor";
 import { useState } from "react";
 import Debugger from "../components/Debugger.jsx";
 import Editor from "../components/Editor.jsx";
+import { Reload } from "../components/Icons.jsx";
+import { GhostButton } from "../components/Button.jsx";
 
 const processor = initializeProcessor();
 
@@ -34,6 +36,7 @@ const DebuggerWrapper = styled.footer`
 
     display: flex;
     align-items: center;
+    justify-content: space-between;
 `;
 
 const ProcessorWrapper = styled.div`
@@ -46,6 +49,8 @@ const ProcessorWrapper = styled.div`
 `;
 
 export default function Play() {
+    const [code, setCode] = useState("");
+
     const [state, _setState] = useState({
         processor,
         undo: [],
@@ -57,7 +62,7 @@ export default function Play() {
     return (
         <FlexRow>
             <PlaySection>
-                <Editor />
+                <Editor value={code} onChange={setCode} />
             </PlaySection>
             <MiddleSection>
                 <ProcessorWrapper>
@@ -68,7 +73,12 @@ export default function Play() {
                 </ProcessorWrapper>
 
                 <DebuggerWrapper>
-                    <Debugger dispatch={() => {}} play={state.play} />
+                    <div>
+                        <Debugger dispatch={() => {}} play={state.play} />
+                    </div>
+                    <GhostButton>
+                        <Reload />
+                    </GhostButton>
                 </DebuggerWrapper>
             </MiddleSection>
             <PlaySection></PlaySection>
