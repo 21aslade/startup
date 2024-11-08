@@ -1,10 +1,14 @@
-import { useCallback, useMemo } from "react";
-import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import CodeMirror, {
+    ReactCodeMirrorRef,
+    ViewUpdate,
+} from "@uiw/react-codemirror";
 import { gruvboxDarkInit } from "@uiw/codemirror-theme-gruvbox-dark";
 import { styled } from "styled-components";
 import { EditorView } from "@codemirror/view";
 import { Diagnostic, linter } from "@codemirror/lint";
 import { parseFile } from "chasm/parser";
+import { activeLine, setActiveLine } from "../editor-plugins.js";
 
 const EditorWrapper = styled.div`
     height: 100%;
@@ -67,19 +71,32 @@ function diagnosticSource(view: EditorView): Diagnostic[] {
 }
 
 const chasmLinter = linter(diagnosticSource);
-const extensions = [chasmLinter];
+const extensions = [chasmLinter, activeLine()];
 
 export type EditorProps = {
     value: string;
     readOnly: boolean;
+    activeLine: number | undefined;
     onChange: (s: string) => void;
 };
 
 export default function Editor({
     value,
     onChange,
+    activeLine,
     readOnly = false,
 }: EditorProps) {
+    const editorRef = useRef<ReactCodeMirrorRef | undefined>(undefined);
+
+    useEffect(() => {
+        if (editorRef.current) {
+            const view = editorRef.current.view;
+            view?.dispatch({
+                effects: setActiveLine.of(activeLine),
+            });
+        }
+    }, [activeLine]);
+
     const onEditorChange = useCallback(
         (val: string, _viewUpdate: ViewUpdate) => {
             onChange(val);
@@ -102,6 +119,7 @@ export default function Editor({
         <EditorWrapper>
             {/* @ts-expect-error */}
             <CodeMirror
+                ref={editorRef}
                 readOnly={readOnly}
                 value={value}
                 height="100%"

@@ -6,8 +6,12 @@ import Debugger from "../components/Debugger.jsx";
 import Editor from "../components/Editor.jsx";
 import { Reload } from "../components/Icons.jsx";
 import { GhostButton } from "../components/Button.jsx";
-import { DebuggerCommandName, dispatchState } from "../debugger.js";
-import { parseFile, toInstructions } from "chasm/parser";
+import {
+    DebuggerCommandName,
+    DebuggerState,
+    dispatchState,
+} from "../debugger.js";
+import { parseFile, toProgram } from "chasm/parser";
 
 const processor = initializeProcessor();
 
@@ -88,11 +92,12 @@ mult_end:
  ret
 `;
 
-const initialState = {
+const initialState: DebuggerState = {
     processor,
     labels: new Map(),
     instructions: [],
     undo: [],
+    pcToLine: [],
     stepLimit: 20000,
     play: false,
 };
@@ -111,7 +116,6 @@ export default function Play() {
 
     const dispatchDebugger = (type: DebuggerCommandName) => {
         if (running) {
-            console.log(state.stepLimit);
             dispatch({ type });
             return;
         }
@@ -130,10 +134,10 @@ export default function Play() {
         }
 
         const lines = parsed.value;
-        const [instructions, labels] = toInstructions(lines);
+        const program = toProgram(lines);
 
         setRunning(true);
-        dispatch({ type: "load-code", labels, instructions });
+        dispatch({ type: "load-code", ...program });
         dispatch({ type });
     };
 
@@ -147,10 +151,17 @@ export default function Play() {
         return () => clearInterval(interval);
     }, [state.play]);
 
+    const activeLine = running ? state.pcToLine[state.processor.pc] : undefined;
+
     return (
         <FlexRow>
             <PlaySection>
-                <Editor value={code} onChange={setCode} readOnly={running} />
+                <Editor
+                    value={code}
+                    activeLine={activeLine}
+                    onChange={setCode}
+                    readOnly={running}
+                />
             </PlaySection>
             <MiddleSection>
                 <ProcessorWrapper>

@@ -1,5 +1,6 @@
 import { applyEffect, Effect, invertEffect } from "chasm/effect";
 import { Instruction, instructionEffect } from "chasm/instructions";
+import { Program } from "chasm/parser";
 import { initializeProcessor, Processor } from "chasm/processor";
 
 export type DebuggerCommandName =
@@ -15,16 +16,13 @@ export type DebuggerCommandName =
 
 export type DebuggerCommand =
     | { type: DebuggerCommandName }
-    | {
-          type: "load-code";
-          labels: Map<string, number>;
-          instructions: Instruction[];
-      };
+    | ({ type: "load-code" } & Program);
 
 export type DebuggerState = {
     processor: Processor;
     labels: Map<string, number>;
     instructions: Instruction[];
+    pcToLine: number[];
     undo: Effect[];
     stepLimit: number;
     play: boolean;
@@ -56,6 +54,7 @@ export function dispatchState(
                 processor: initializeProcessor(),
                 labels: new Map(),
                 instructions: [],
+                pcToLine: [],
                 undo: [],
                 play: false,
                 stepLimit: state.stepLimit,
@@ -65,6 +64,7 @@ export function dispatchState(
                 ...state,
                 labels: action.labels,
                 instructions: action.instructions,
+                pcToLine: action.pcToLine,
             };
     }
 }
@@ -91,12 +91,9 @@ function runInstruction(
     const undo = [...state.undo, inverse];
 
     return {
+        ...state,
         processor,
-        labels: state.labels,
-        instructions: state.instructions,
         undo,
-        play: state.play,
-        stepLimit: state.stepLimit,
     };
 }
 
@@ -168,11 +165,8 @@ function unstep(state: DebuggerState): DebuggerState {
 
     const processor = applyEffect(state.processor, effect);
     return {
+        ...state,
         processor,
-        labels: state.labels,
-        instructions: state.instructions,
         undo: state.undo.slice(0, -1),
-        play: state.play,
-        stepLimit: state.stepLimit,
     };
 }
