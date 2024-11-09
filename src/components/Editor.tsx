@@ -20,6 +20,7 @@ import {
     breakpointGutter,
     setActiveLine,
     setLineFilter,
+    setSetBreakpoints,
 } from "../editor-plugins.js";
 
 const EditorWrapper = styled.div`
@@ -91,12 +92,14 @@ export type EditorProps = {
     activeLine: number | undefined;
     lineToPc: (number | undefined)[] | undefined;
     onChange: (s: string) => void;
+    setBreakpoints: (n: number[]) => void;
 };
 
 export default function Editor({
     value,
     lineToPc,
     onChange,
+    setBreakpoints,
     activeLine,
     readOnly = false,
 }: EditorProps) {
@@ -104,8 +107,7 @@ export default function Editor({
 
     useEditorProp(editorRef, activeLine, setActiveLine);
     useEditorProp(editorRef, lineToPc, setLineFilter);
-    //useEditorProp(editorRef, handleBreakpoint, setHandleBreakpoint);
-    //useEditorProp(editorRef, breakpoints, replaceBreakpoints);
+    useEditorProp(editorRef, setBreakpoints, setSetBreakpoints);
 
     const onEditorChange = useCallback(
         (val: string, _viewUpdate: ViewUpdate) => {

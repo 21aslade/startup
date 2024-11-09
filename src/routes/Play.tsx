@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 import { Processor } from "../components/Processor.jsx";
 import { initializeProcessor } from "chasm/processor";
-import { useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import Debugger from "../components/Debugger.jsx";
 import Editor from "../components/Editor.jsx";
 import { Reload } from "../components/Icons.jsx";
@@ -11,7 +11,7 @@ import {
     DebuggerState,
     dispatchState,
 } from "../debugger.js";
-import { parseFile, toProgram } from "chasm/parser";
+import { parseFile, Program, toProgram } from "chasm/parser";
 
 const processor = initializeProcessor();
 
@@ -59,7 +59,29 @@ const initialState: DebuggerState = {
     undo: [],
     stepLimit: 20000,
     play: false,
+    breakpoints: new Set(),
 };
+
+function isProgramStarter(type: DebuggerCommandName): boolean {
+    switch (type) {
+        case "step-back":
+        case "pause":
+        case "skip-back":
+            return false;
+        default:
+            return true;
+    }
+}
+
+function loadProgram(code: string): Program | undefined {
+    const parsed = parseFile(code);
+    if (parsed.isErr()) {
+        return; // todo: signal to user
+    }
+
+    const lines = parsed.value;
+    return toProgram(lines);
+}
 
 export default function Play() {
     const [code, setCode] = useState("");
@@ -73,33 +95,27 @@ export default function Play() {
     const reloadCode = () => dispatch({ type: "reload" });
 
     const dispatchDebugger = (type: DebuggerCommandName) => {
-        if (program !== undefined) {
-            dispatch({ type });
-            return;
-        }
-
-        switch (type) {
-            case "step-back":
-            case "pause":
-            case "skip-back":
+        if (program === undefined) {
+            if (!isProgramStarter(type)) {
                 return;
+            }
+
+            const newProgram = loadProgram(code);
+            if (newProgram === undefined) {
+                return;
+            }
+
+            dispatch({ type: "load-code", program: newProgram });
         }
 
-        const parsed = parseFile(code);
-        if (parsed.isErr()) {
-            return; // todo: signal to user
-        }
-
-        const lines = parsed.value;
-        const newProgram = toProgram(lines);
-
-        dispatch({ type: "load-code", program: newProgram });
         dispatch({ type });
     };
 
+    const play = state.play;
+
     useEffect(() => {
         const interval = setInterval(() => {
-            if (state.play && !state.processor.halted) {
+            if (play) {
                 if (program === undefined) {
                     dispatch({ type: "pause" });
                     return;
@@ -110,10 +126,14 @@ export default function Play() {
         }, 20);
 
         return () => clearInterval(interval);
-    }, [state.play]);
+    }, [play, program]);
 
     const activeLine = program?.pcToLine[state.processor.pc];
     const lineToPc = program?.lineToPc;
+
+    const setBreakpoints = useCallback((breakpoints: number[]) => {
+        dispatch({ type: "set-breakpoints", breakpoints });
+    }, []);
 
     return (
         <FlexRow>
@@ -122,6 +142,7 @@ export default function Play() {
                     value={code}
                     activeLine={activeLine}
                     onChange={setCode}
+                    setBreakpoints={setBreakpoints}
                     readOnly={program !== undefined}
                     lineToPc={lineToPc}
                 />

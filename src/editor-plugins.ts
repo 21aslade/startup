@@ -191,6 +191,14 @@ const breakpointField = StateField.define<RangeSet<GutterMarker>>({
     },
 });
 
+const updateReactBreakpoints = EditorView.updateListener.of((update) => {
+    const breakpoints = update.state.field(breakpointField);
+    if (breakpoints !== update.startState.field(breakpointField)) {
+        const setBreakpoints = update.state.field(setBreakpointsField);
+        setBreakpoints(rangesToLines(update.state.doc, breakpoints));
+    }
+});
+
 const breakpointMarker = new (class extends GutterMarker {
     toDOM() {
         return document.createTextNode("🔴");
@@ -244,6 +252,7 @@ const breakpointGutter = [
     breakpointField,
     setBreakpointsField,
     lineFilterLinstener,
+    updateReactBreakpoints,
     breakpointGutterExtension,
     breakpointGutterTheme,
 ];

@@ -16,6 +16,7 @@ export type DebuggerCommandName =
 export type DebuggerCommand =
     | { type: DebuggerCommandName }
     | { type: "reload" }
+    | { type: "set-breakpoints"; breakpoints: number[] }
     | { type: "load-code"; program: Program };
 
 export type DebuggerState = {
@@ -23,12 +24,14 @@ export type DebuggerState = {
     undo: Effect[];
     stepLimit: number;
     play: boolean;
+    breakpoints: Set<number>;
 };
 
 export function dispatchState(
     [state, program]: [DebuggerState, Program?],
     action: DebuggerCommand
 ): [DebuggerState, Program?] {
+    console.log("Dispatching");
     switch (action.type) {
         case "reload":
             return [
@@ -37,9 +40,21 @@ export function dispatchState(
                     undo: [],
                     play: false,
                     stepLimit: state.stepLimit,
+                    breakpoints: new Set(),
                 },
                 undefined,
             ];
+        case "set-breakpoints":
+            if (program !== undefined) {
+                const breakpoints = new Set(
+                    action.breakpoints
+                        .map((l) => program.lineToPc[l])
+                        .filter((l) => l !== undefined)
+                );
+                return [{ ...state, breakpoints }, program];
+            } else {
+                return [state, program];
+            }
         case "load-code":
             return [state, action.program];
         default:
@@ -59,23 +74,36 @@ function dispatchProgramStep(
     state: DebuggerState,
     program: Program
 ): DebuggerState {
+    let result;
     switch (action) {
         case "step-in":
-            return step(state, program);
+            result = step(state, program);
+            break;
         case "step-over":
-            return stepOver(state, program);
+            result = stepOver(state, program);
+            break;
         case "step-out":
-            return stepOut(state, program);
+            result = stepOut(state, program);
+            break;
         case "step-back":
-            return unstep(state);
+            result = unstep(state);
+            break;
         case "play":
             return { ...state, play: true };
         case "pause":
             return { ...state, play: false };
         case "skip":
-            return skipForward(state, program);
+            result = skipForward(state, program);
+            break;
         case "skip-back":
-            return skipBack(state);
+            result = skipBack(state);
+            break;
+    }
+
+    if (result.breakpoints.has(result.processor.pc)) {
+        return { ...result, play: false };
+    } else {
+        return result;
     }
 }
 
