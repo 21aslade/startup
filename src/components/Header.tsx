@@ -20,16 +20,18 @@ const MainNav = styled.nav`
     align-items: center;
 `;
 
-export default function Header() {
+export default function Header({ authenticated }: { authenticated: boolean }) {
     return (
         <Container>
             <NavLink to="/">
                 <img src="/logo.png" width="100px"></img>
             </NavLink>
-            <MainNav>
-                <NavButton to="/profile">Profile</NavButton>
-                <NavButton to="/play">Play</NavButton>
-            </MainNav>
+            {authenticated ? (
+                <MainNav>
+                    <NavButton to="/profile">Profile</NavButton>
+                    <NavButton to="/play">Play</NavButton>
+                </MainNav>
+            ) : undefined}
         </Container>
     );
 }

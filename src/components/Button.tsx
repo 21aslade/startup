@@ -60,6 +60,7 @@ export const PrimaryButton = styled(ButtonBase)`
 `;
 
 export const SecondaryButton = styled(ButtonBase)`
+    background-color: transparent;
     padding: 6px;
     border: 2px solid var(--button-primary-bg);
 
