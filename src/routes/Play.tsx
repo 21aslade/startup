@@ -101,7 +101,10 @@ export default function Play() {
             }
 
             const newProgram = loadProgram(code);
-            if (newProgram === undefined) {
+            if (
+                newProgram === undefined ||
+                newProgram.instructions.length <= 0
+            ) {
                 return;
             }
 
