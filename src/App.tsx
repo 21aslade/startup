@@ -22,21 +22,26 @@ export default function App() {
 
 type AppRoutesProps = {
     username: string | undefined;
-    setUsername: (s: string) => void;
+    setUsername: (s?: string) => void;
 };
 function AppRoutes({ username, setUsername }: AppRoutesProps) {
     const navigate = useNavigate();
 
-    const onLogin = (n: string) => {
+    const onLogin = (n?: string) => {
         setUsername(n);
-        navigate("/profile");
+        if (n !== undefined) {
+            navigate("/profile");
+        }
     };
 
     const authenticated = username !== undefined;
 
     return (
         <Routes>
-            <Route path="/" element={<Home onLogin={onLogin} />} />
+            <Route
+                path="/"
+                element={<Home onLogin={onLogin} username={username} />}
+            />
             <Route
                 path="/profile"
                 element={

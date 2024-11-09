@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PrimaryButton } from "../components/Button.jsx";
+import { PrimaryButton, SecondaryButton } from "../components/Button.jsx";
 import { styled } from "styled-components";
 
 const Layout = styled.div`
@@ -46,6 +46,7 @@ const LoginInput = styled.input`
 `;
 
 type LoginProps = {
+    loggedInUsername?: string;
     onSubmit: (s: string) => void;
 };
 function Login({ onSubmit }: LoginProps) {
@@ -86,10 +87,11 @@ function Login({ onSubmit }: LoginProps) {
 }
 
 export type HomeProps = {
-    onLogin: (s: string) => void;
+    username?: string;
+    onLogin: (s: string | undefined) => void;
 };
 
-export default function Home({ onLogin }: HomeProps) {
+export default function Home({ username, onLogin }: HomeProps) {
     return (
         <Layout>
             <section>
@@ -114,7 +116,16 @@ export default function Home({ onLogin }: HomeProps) {
                 </PromotionB>
             </section>
             <section>
-                <Login onSubmit={onLogin} />
+                {username === undefined ? (
+                    <Login onSubmit={onLogin} />
+                ) : (
+                    <LoginWrapper>
+                        <h3>Welcome back, {username}</h3>
+                        <SecondaryButton onClick={() => onLogin(undefined)}>
+                            Logout
+                        </SecondaryButton>
+                    </LoginWrapper>
+                )}
             </section>
         </Layout>
     );
