@@ -1,16 +1,24 @@
 import { styled } from "styled-components";
 import { NavButton } from "./Button.jsx";
 import { NavLink } from "react-router-dom";
-const Container = styled.header`
+
+const Bar = styled.header`
     background-color: var(--bg-zero-s);
     border-bottom: 1px solid var(--border);
 
-    flex: 0 40px;
+    flex: 0 68px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 0 16px;
     width: 100%;
     box-sizing: border-box;
+`;
+
+const Container = styled.div`
+    display: flex;
+    align-items: center;
+    height: 100%;
 `;
 
 const MainNav = styled.nav`
@@ -20,18 +28,25 @@ const MainNav = styled.nav`
     align-items: center;
 `;
 
-export default function Header({ authenticated }: { authenticated: boolean }) {
+export default function Header({ username }: { username?: string }) {
     return (
-        <Container>
-            <NavLink to="/">
-                <img src="/logo.png" width="100px"></img>
-            </NavLink>
-            {authenticated ? (
-                <MainNav>
-                    <NavButton to="/profile">Profile</NavButton>
-                    <NavButton to="/play">Play</NavButton>
-                </MainNav>
+        <Bar>
+            <Container>
+                <NavLink to="/">
+                    <img src="/logo.png" width="100px"></img>
+                </NavLink>
+                {username !== undefined ? (
+                    <MainNav>
+                        <NavButton to="/profile">Profile</NavButton>
+                        <NavButton to="/play">Play</NavButton>
+                    </MainNav>
+                ) : undefined}
+            </Container>
+            {username !== undefined ? (
+                <div>
+                    <h3>{username}</h3>
+                </div>
             ) : undefined}
-        </Container>
+        </Bar>
     );
 }

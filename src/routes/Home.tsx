@@ -1,4 +1,5 @@
-import { PrimaryButton, SecondaryButton } from "../components/Button.jsx";
+import { useState } from "react";
+import { PrimaryButton } from "../components/Button.jsx";
 import { styled } from "styled-components";
 
 const Layout = styled.div`
@@ -44,34 +45,51 @@ const LoginInput = styled.input`
     font-size: 1.1rem;
 `;
 
-function Login() {
+type LoginProps = {
+    onSubmit: (s: string) => void;
+};
+function Login({ onSubmit }: LoginProps) {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
     return (
         <LoginWrapper>
             <LoginInput
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 type="text"
                 autoComplete="username"
                 aria-label="username"
                 placeholder="Username"
             />
             <LoginInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 autoComplete="current-password"
                 aria-label="password"
                 placeholder="Password"
             />
             <div>
-                <PrimaryButton type="submit">Login</PrimaryButton>
-                <SecondaryButton type="submit">Register</SecondaryButton>
+                <PrimaryButton
+                    onClick={() => {
+                        if (username.length > 0 && password.length > 0) {
+                            onSubmit(username);
+                        }
+                    }}
+                >
+                    Login
+                </PrimaryButton>
             </div>
         </LoginWrapper>
     );
 }
 
 export type HomeProps = {
-    setUsername: (s: string) => void;
+    onLogin: (s: string) => void;
 };
 
-export default function Home({ setUsername: _ }: HomeProps) {
+export default function Home({ onLogin }: HomeProps) {
     return (
         <Layout>
             <section>
@@ -96,7 +114,7 @@ export default function Home({ setUsername: _ }: HomeProps) {
                 </PromotionB>
             </section>
             <section>
-                <Login />
+                <Login onSubmit={onLogin} />
             </section>
         </Layout>
     );
