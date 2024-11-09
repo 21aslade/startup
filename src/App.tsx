@@ -4,6 +4,7 @@ import Footer from "./components/Footer.jsx";
 import { PropsWithChildren, useEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
 import Play from "./routes/Play.jsx";
+import Profile from "./routes/Profile.jsx";
 
 export default function App() {
     const [username, setUsername] = useState<string | undefined>(undefined);
@@ -12,10 +13,7 @@ export default function App() {
         <BrowserRouter>
             <Header username={username} />
             <main>
-                <AppRoutes
-                    authenticated={username !== undefined}
-                    setUsername={setUsername}
-                />
+                <AppRoutes username={username} setUsername={setUsername} />
             </main>
             <Footer />
         </BrowserRouter>
@@ -23,16 +21,18 @@ export default function App() {
 }
 
 type AppRoutesProps = {
-    authenticated: boolean;
+    username: string | undefined;
     setUsername: (s: string) => void;
 };
-function AppRoutes({ authenticated, setUsername }: AppRoutesProps) {
+function AppRoutes({ username, setUsername }: AppRoutesProps) {
     const navigate = useNavigate();
 
     const onLogin = (n: string) => {
         setUsername(n);
         navigate("/profile");
     };
+
+    const authenticated = username !== undefined;
 
     return (
         <Routes>
@@ -41,7 +41,7 @@ function AppRoutes({ authenticated, setUsername }: AppRoutesProps) {
                 path="/profile"
                 element={
                     <RequireAuth authenticated={authenticated} backupRoute="/">
-                        {"Profile"}
+                        <Profile username={username!!} />
                     </RequireAuth>
                 }
             />
