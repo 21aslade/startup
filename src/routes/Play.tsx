@@ -54,68 +54,26 @@ const ProcessorWrapper = styled.div`
     justify-content: center;
 `;
 
-const starterCode = ` mov r0, 2
- str [0], r0
- mov r0, 3
- str [1], r0
- mov r6, 1
-loop:
- ldr r0, [r5]
- ldr r1, [r6]
- call mult
- cmp r0, 0
- bne continue
- add r0, r6
-continue:
- add r5, 1
- add r6, r5, 1
- str [r6], r0
- cmp r6, 255
- bne loop
- hlt
-
-; mult(a: u8, b: u8) -> u8
-mult:
- mov r2, r0
- mov r0, 0
- mov r3, 7
-mult_loop:
- lsr r4, r1, r3
- and r4, 1
- beq mult_loop_end
- add r0, r2
-mult_loop_end:
- lsl r0, 1
- sub r3, 1
- bpl mult_loop
-mult_end:
- ret
-`;
-
 const initialState: DebuggerState = {
     processor,
-    labels: new Map(),
-    instructions: [],
     undo: [],
-    pcToLine: [],
     stepLimit: 20000,
     play: false,
 };
 
 export default function Play() {
-    const [code, setCode] = useState(starterCode);
-    const [state, dispatch] = useReducer(dispatchState, initialState);
-    const [running, setRunning] = useState(false);
+    const [code, setCode] = useState("");
+    const [[state, program], dispatch] = useReducer(dispatchState, [
+        initialState,
+        undefined,
+    ]);
 
     const epoch = state.undo.length;
 
-    const reloadCode = () => {
-        setRunning(false);
-        dispatch({ type: "reload" });
-    };
+    const reloadCode = () => dispatch({ type: "reload" });
 
     const dispatchDebugger = (type: DebuggerCommandName) => {
-        if (running) {
+        if (program !== undefined) {
             dispatch({ type });
             return;
         }
@@ -124,7 +82,6 @@ export default function Play() {
             case "step-back":
             case "pause":
             case "skip-back":
-            case "reload":
                 return;
         }
 
@@ -134,16 +91,20 @@ export default function Play() {
         }
 
         const lines = parsed.value;
-        const program = toProgram(lines);
+        const newProgram = toProgram(lines);
 
-        setRunning(true);
-        dispatch({ type: "load-code", ...program });
+        dispatch({ type: "load-code", program: newProgram });
         dispatch({ type });
     };
 
     useEffect(() => {
         const interval = setInterval(() => {
             if (state.play && !state.processor.halted) {
+                if (program === undefined) {
+                    dispatch({ type: "pause" });
+                    return;
+                }
+
                 dispatch({ type: "step-in" });
             }
         }, 20);
@@ -151,7 +112,8 @@ export default function Play() {
         return () => clearInterval(interval);
     }, [state.play]);
 
-    const activeLine = running ? state.pcToLine[state.processor.pc] : undefined;
+    const activeLine = program?.pcToLine[state.processor.pc];
+    const lineToPc = program?.lineToPc;
 
     return (
         <FlexRow>
@@ -160,7 +122,8 @@ export default function Play() {
                     value={code}
                     activeLine={activeLine}
                     onChange={setCode}
-                    readOnly={running}
+                    readOnly={program !== undefined}
+                    lineToPc={lineToPc}
                 />
             </PlaySection>
             <MiddleSection>

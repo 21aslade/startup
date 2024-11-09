@@ -1,6 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+    MutableRefObject,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+} from "react";
 import CodeMirror, {
     ReactCodeMirrorRef,
+    StateEffectType,
     ViewUpdate,
 } from "@uiw/react-codemirror";
 import { gruvboxDarkInit } from "@uiw/codemirror-theme-gruvbox-dark";
@@ -8,7 +15,12 @@ import { styled } from "styled-components";
 import { EditorView } from "@codemirror/view";
 import { Diagnostic, linter } from "@codemirror/lint";
 import { parseFile } from "chasm/parser";
-import { activeLine, setActiveLine } from "../editor-plugins.js";
+import {
+    activeLine,
+    breakpointGutter,
+    setActiveLine,
+    setLineFilter,
+} from "../editor-plugins.js";
 
 const EditorWrapper = styled.div`
     height: 100%;
@@ -71,31 +83,29 @@ function diagnosticSource(view: EditorView): Diagnostic[] {
 }
 
 const chasmLinter = linter(diagnosticSource);
-const extensions = [chasmLinter, activeLine()];
+const extensions = [chasmLinter, activeLine, breakpointGutter];
 
 export type EditorProps = {
     value: string;
     readOnly: boolean;
     activeLine: number | undefined;
+    lineToPc: (number | undefined)[] | undefined;
     onChange: (s: string) => void;
 };
 
 export default function Editor({
     value,
+    lineToPc,
     onChange,
     activeLine,
     readOnly = false,
 }: EditorProps) {
     const editorRef = useRef<ReactCodeMirrorRef | undefined>(undefined);
 
-    useEffect(() => {
-        if (editorRef.current) {
-            const view = editorRef.current.view;
-            view?.dispatch({
-                effects: setActiveLine.of(activeLine),
-            });
-        }
-    }, [activeLine]);
+    useEditorProp(editorRef, activeLine, setActiveLine);
+    useEditorProp(editorRef, lineToPc, setLineFilter);
+    //useEditorProp(editorRef, handleBreakpoint, setHandleBreakpoint);
+    //useEditorProp(editorRef, breakpoints, replaceBreakpoints);
 
     const onEditorChange = useCallback(
         (val: string, _viewUpdate: ViewUpdate) => {
@@ -132,4 +142,19 @@ export default function Editor({
             />
         </EditorWrapper>
     );
+}
+
+function useEditorProp<T>(
+    editorRef: MutableRefObject<ReactCodeMirrorRef | undefined>,
+    value: T,
+    effect: StateEffectType<T>
+) {
+    useEffect(() => {
+        if (editorRef.current) {
+            const view = editorRef.current.view;
+            view?.dispatch({
+                effects: effect.of(value),
+            });
+        }
+    }, [value]);
 }
