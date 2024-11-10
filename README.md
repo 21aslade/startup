@@ -58,3 +58,37 @@ For this deliverable I styled the application to an approximation of its final a
 -   [x] **Responsive to window resizing** - My app looks great on all window sizes (as long as they're reasonably wide)
 -   [x] **Application text content** - Consistent fonts
 -   [x] **Application images** - Images are appropriately sized and aligned
+
+## Startup React
+
+For this deliverable I implemented all the websocket-free behavior of my application!
+
+To be clear, this means I:
+
+-   Implemented an entire assembly language parser and interpreter (and its backing parser library)
+-   Created a debugger interface, which required integrating with an opinionated non-React Javascript component
+-   Wrote documentation for the assembly language and its interface
+
+Rubric-wise, that looks like this:
+
+-   [x] **Bundled and transpiled** - done!
+-   [x] **Components** Login, profile, debugger, and documentation!
+    -   [x] **login** - When you press enter or the login button it takes you to the profile page.
+    -   [x] **database** - On the profile page, you can see stuff that'd be loaded from the database!
+    -   [ ] **WebSocket** - I didn't mock websockets for this deliverable because I want the result to be usable.
+    -   [x] **application logic** - hoo boy, there sure was a lot of logic in this application
+-   [x] **Router** - routing!
+-   [x] **Hooks** - uses a bunch of hooks, and also makes a custom hook! ([useEditorProp](https://github.com/21aslade/startup/blob/main/src/components/Editor.tsx#L149), for synchronizing with CodeMirror)
+
+I worked really, really hard on this deliverable (including the dependencies that only exist for it, there are _121_ commits involved). I know I didn't mock the websockets, but it's unclear how I should. I also didn't realize from reading the rubric that mocking WebSocket would be required. Hopefully it's clear that I'm fully capable of mocking the WebSocket behavior. I'd appreciate it if I can still get full credit.
+
+## Dependencies
+
+I use a number of dependencies in this project; I wrote some of them, but others are external:
+
+-   [`chasm`](https://github.com/21aslade/chasm), an assembly parser and interpreter. I made it from scratch for this project!
+-   [`wombo`](https://github.com/21aslade/wombo), the parser library backing `chasm`. Also made by me!
+-   [`react-codemirror`](https://uiwjs.github.io/react-codemirror/), the editor I use. This was not made by me, but I got permission from the TA to use it. I also made some extensions for it:
+    -   While the debugger is running, the currently executing line is highlighted
+    -   Breakpoints can be added by clicking the line numbers
+-   [`styled-components`](https://styled-components.com/), a simple style library. I use it just for convenience
