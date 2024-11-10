@@ -3,12 +3,14 @@ import basics from "./basics.jsx";
 import memory from "./memory.jsx";
 import arithmetic from "./arithmetic.jsx";
 import controlFlow from "./control_flow.jsx";
+import misc from "./misc.jsx";
 
 const allDocs: [string, Doc[]][] = [
     ["Basics", basics],
     ["Memory", memory],
     ["Arithmetic", arithmetic],
     ["Control Flow", controlFlow],
+    ["Misc", misc],
 ];
 
 export type Doc = {

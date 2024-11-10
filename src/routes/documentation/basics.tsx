@@ -20,9 +20,6 @@ const Instructions = () => {
             </p>
             <ul>
                 <li>
-                    Register instructions (<code>mov</code>)
-                </li>
-                <li>
                     Memory instructions (<code>ldr</code> and <code>str</code>)
                 </li>
                 <li>
@@ -32,6 +29,10 @@ const Instructions = () => {
                 <li>
                     Control flow instructions (<code>cmp</code>, <code>b</code>,{" "}
                     <code>call</code>, and <code>ret</code>)
+                </li>
+                <li>
+                    Misc instructions (<code>mov</code>, <code>hlt</code>, and{" "}
+                    <code>nop</code>)
                 </li>
             </ul>
             <p>
@@ -159,7 +160,9 @@ const Operands = () => {
             </ul>
             <p>
                 Each instruction takes specific types of operands, shown in
-                their documentation pages.
+                their documentation pages. When register is used as a value or
+                an address, the current value of that register (before the
+                instruction is executed) is used.
             </p>
         </>
     );
