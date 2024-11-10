@@ -12,6 +12,10 @@ import {
     dispatchState,
 } from "../debugger.js";
 import { parseFile, Program, toProgram } from "chasm/parser";
+import { DocsViewer } from "../components/DocsViewer.jsx";
+import { Collapsible } from "../components/Collapsible.jsx";
+import { docs, docsList } from "./documentation/documentation.jsx";
+import DocsList from "../components/DocsList.jsx";
 
 const processor = initializeProcessor();
 
@@ -172,7 +176,17 @@ export default function Play() {
                     </GhostButton>
                 </DebuggerWrapper>
             </MiddleSection>
-            <PlaySection></PlaySection>
+            <PlaySection>
+                <DocsViewer docs={docs}>
+                    {docsList.map(([label, items]) => {
+                        return (
+                            <Collapsible title={label}>
+                                <DocsList items={items} />
+                            </Collapsible>
+                        );
+                    })}
+                </DocsViewer>
+            </PlaySection>
         </FlexRow>
     );
 }
