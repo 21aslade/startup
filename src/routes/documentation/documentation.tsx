@@ -4,14 +4,7 @@ import memory from "./memory.jsx";
 import arithmetic from "./arithmetic.jsx";
 import controlFlow from "./control_flow.jsx";
 import misc from "./misc.jsx";
-
-const allDocs: [string, Doc[]][] = [
-    ["Basics", basics],
-    ["Memory", memory],
-    ["Arithmetic", arithmetic],
-    ["Control Flow", controlFlow],
-    ["Misc", misc],
-];
+import examples from "./examples.jsx";
 
 export type Doc = {
     id: string;
@@ -19,12 +12,28 @@ export type Doc = {
     content: JSX.Element | string;
 };
 
-const docsList: [string, [string, string][]][] = allDocs.map(
-    ([group, docs]) => [group, docs.map(({ id, label }) => [id, label])]
-);
+function getDocs(
+    setCode: (s: string) => void
+): [[string, [string, string][]][], Map<string, JSX.Element | string>] {
+    const allDocs: [string, Doc[]][] = [
+        ["Basics", basics],
+        ["Memory", memory],
+        ["Arithmetic", arithmetic],
+        ["Control Flow", controlFlow],
+        ["Misc", misc],
+        ["Examples", examples(setCode)],
+    ];
+    return [
+        allDocs.map(([group, docs]) => [
+            group,
+            docs.map(({ id, label }) => [id, label]),
+        ]),
+        new Map(
+            allDocs
+                .flatMap(([_, docs]) => docs)
+                .map(({ id, content }) => [id, content])
+        ),
+    ];
+}
 
-const docs = new Map(
-    allDocs.flatMap(([_, docs]) => docs).map(({ id, content }) => [id, content])
-);
-
-export { docsList, docs };
+export { getDocs };

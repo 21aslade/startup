@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 import { Processor } from "../components/Processor.jsx";
 import { initializeProcessor } from "chasm/processor";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import Debugger from "../components/Debugger.jsx";
 import Editor from "../components/Editor.jsx";
 import { Reload } from "../components/Icons.jsx";
@@ -14,10 +14,8 @@ import {
 import { parseFile, Program, toProgram } from "chasm/parser";
 import { DocsViewer } from "../components/DocsViewer.jsx";
 import { Collapsible } from "../components/Collapsible.jsx";
-import { docs, docsList } from "./documentation/documentation.jsx";
+import { getDocs } from "./documentation/documentation.jsx";
 import DocsList from "../components/DocsList.jsx";
-
-const processor = initializeProcessor();
 
 const FlexRow = styled.section`
     display: flex;
@@ -59,6 +57,7 @@ const ProcessorWrapper = styled.div`
     justify-content: center;
 `;
 
+const processor = initializeProcessor();
 const initialState: DebuggerState = {
     processor,
     undo: [],
@@ -142,6 +141,14 @@ export default function Play() {
     const setBreakpoints = useCallback((breakpoints: number[]) => {
         dispatch({ type: "set-breakpoints", breakpoints });
     }, []);
+
+    const [docsList, docs] = useMemo(() => {
+        const set = (code: string) => {
+            dispatch({ type: "reload" });
+            setCode(code);
+        };
+        return getDocs(set);
+    }, [setCode, dispatch]);
 
     return (
         <FlexRow>
