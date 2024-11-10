@@ -137,7 +137,12 @@ function runInstruction(
 }
 
 function skipForward(state: DebuggerState, program: Program): DebuggerState {
-    while (canMoveForward(state, program)) {
+    let run = false;
+    while (
+        canMoveForward(state, program) &&
+        (!run || !state.breakpoints.has(state.processor.pc))
+    ) {
+        run = true;
         state = step(state, program);
     }
 
@@ -145,7 +150,12 @@ function skipForward(state: DebuggerState, program: Program): DebuggerState {
 }
 
 function skipBack(state: DebuggerState): DebuggerState {
-    while (state.undo.length > 0) {
+    let run = false;
+    while (
+        state.undo.length > 0 &&
+        (!run || !state.breakpoints.has(state.processor.pc))
+    ) {
+        run = true;
         state = unstep(state);
     }
 
@@ -177,7 +187,11 @@ function stepOut(state: DebuggerState, program: Program): DebuggerState {
         } else {
             state = runInstruction(state, program, instruction);
         }
-    } while (instruction.op !== "ret" && canMoveForward(state, program));
+    } while (
+        instruction.op !== "ret" &&
+        canMoveForward(state, program) &&
+        !state.breakpoints.has(state.processor.pc)
+    );
 
     return state;
 }
@@ -189,7 +203,10 @@ function stepOver(state: DebuggerState, program: Program): DebuggerState {
 
     let instruction = program.instructions[state.processor.pc];
     const resultState = runInstruction(state, program, instruction);
-    if (instruction.op !== "call") {
+    if (
+        instruction.op !== "call" ||
+        state.breakpoints.has(state.processor.pc)
+    ) {
         return resultState;
     }
 
