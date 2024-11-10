@@ -31,6 +31,7 @@ const PlaySection = styled.section`
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow: auto;
 `;
 
 const MiddleSection = styled(PlaySection)`
