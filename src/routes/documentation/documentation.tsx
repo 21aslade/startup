@@ -1,7 +1,13 @@
 import { JSX } from "react";
 import basics from "./basics.jsx";
+import memory from "./memory.jsx";
+import arithmetic from "./arithmetic.jsx";
 
-const allDocs: [string, Doc[]][] = [["Basics", basics]];
+const allDocs: [string, Doc[]][] = [
+    ["Basics", basics],
+    ["Memory", memory],
+    ["Arithmetic", arithmetic],
+];
 
 export type Doc = {
     id: string;
