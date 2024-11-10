@@ -1,5 +1,5 @@
 import { styled } from "styled-components";
-import { useSetDoc } from "./DocsViewer.jsx";
+import { useDoc } from "./DocsViewer.jsx";
 
 const Container = styled.div`
     display: grid;
@@ -7,9 +7,9 @@ const Container = styled.div`
     grid-row-gap: 1em;
 `;
 
-const DocsItem = styled.span`
+const DocsItem = styled.span<{ $active: boolean }>`
     font-size: 1em;
-    font-weight: bold;
+    ${({ $active }) => ($active ? "font-weight: bold" : "")};
     cursor: pointer;
 `;
 
@@ -18,12 +18,16 @@ export type DocsListProps = {
 };
 
 export default function DocsList({ items }: DocsListProps) {
-    const setDoc = useSetDoc();
+    const [doc, setDoc] = useDoc();
 
     return (
         <Container>
             {items.map(([key, label]) => (
-                <DocsItem key={key} onClick={() => setDoc(key)}>
+                <DocsItem
+                    key={key}
+                    $active={doc === key}
+                    onClick={() => setDoc(key)}
+                >
                     {label}
                 </DocsItem>
             ))}

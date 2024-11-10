@@ -3,20 +3,22 @@ import {
     JSX,
     PropsWithChildren,
     useContext,
-    useEffect,
     useRef,
     useState,
 } from "react";
 import { styled } from "styled-components";
 
-const SetDocContext = createContext<(doc: string) => void>(() => {
-    throw new Error(
-        "useSetDoc should only be used under a Documentation element"
-    );
-});
+const DocContext = createContext<[string | undefined, (doc: string) => void]>([
+    undefined,
+    () => {
+        throw new Error(
+            "useSetDoc should only be used under a Documentation element"
+        );
+    },
+]);
 
-export function useSetDoc(): (doc: string) => void {
-    return useContext(SetDocContext);
+export function useDoc(): [string | undefined, (doc: string) => void] {
+    return useContext(DocContext);
 }
 
 const DocsWrapper = styled.div`
@@ -38,20 +40,14 @@ export function DocsViewer({ docs, defaultDoc, children }: DocumentationProps) {
     const [doc, setDoc] = useState<string | undefined>(defaultDoc);
     const docDiv = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        if (doc !== undefined && docDiv.current) {
-            docDiv.current.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [doc]);
-
     return (
-        <SetDocContext.Provider value={setDoc}>
+        <DocContext.Provider value={[doc, setDoc]}>
             <DocsWrapper>
                 <DividerBar ref={docDiv}>
                     {doc !== undefined && docs.get(doc)}
                 </DividerBar>
                 <div>{children}</div>
             </DocsWrapper>
-        </SetDocContext.Provider>
+        </DocContext.Provider>
     );
 }
