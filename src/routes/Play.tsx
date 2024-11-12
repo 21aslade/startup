@@ -139,6 +139,7 @@ export default function Play() {
     const lineToPc = program?.lineToPc;
 
     const setBreakpoints = useCallback((breakpoints: number[]) => {
+        console.log("Setting breakpoints");
         dispatch({ type: "set-breakpoints", breakpoints });
     }, []);
 

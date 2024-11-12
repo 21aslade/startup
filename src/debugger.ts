@@ -31,7 +31,6 @@ export function dispatchState(
     [state, program]: [DebuggerState, Program?],
     action: DebuggerCommand
 ): [DebuggerState, Program?] {
-    console.log("Dispatching");
     switch (action.type) {
         case "reload":
             return [

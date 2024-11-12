@@ -9,10 +9,11 @@ import CodeMirror, {
     ReactCodeMirrorRef,
     StateEffectType,
     ViewUpdate,
+    EditorView,
 } from "@uiw/react-codemirror";
 import { gruvboxDarkInit } from "@uiw/codemirror-theme-gruvbox-dark";
 import { styled } from "styled-components";
-import { EditorView } from "@codemirror/view";
+import { EditorView as LintEditorView } from "@codemirror/view";
 import { Diagnostic, linter } from "@codemirror/lint";
 import { parseFile } from "chasm/parser";
 import {
@@ -65,7 +66,7 @@ function getNextDiagnostic(
     ];
 }
 
-function diagnosticSource(view: EditorView): Diagnostic[] {
+function diagnosticSource(view: LintEditorView): Diagnostic[] {
     const initialText = view.state.doc.toString();
     let text = initialText;
     let diagnostics: Diagnostic[] = [];
@@ -105,15 +106,28 @@ export default function Editor({
 }: EditorProps) {
     const editorRef = useRef<ReactCodeMirrorRef | undefined>(undefined);
 
-    useEditorProp(editorRef, activeLine, setActiveLine);
-    useEditorProp(editorRef, lineToPc, setLineFilter);
-    useEditorProp(editorRef, setBreakpoints, setSetBreakpoints);
+    const updateLine = useEditorProp(editorRef, activeLine, setActiveLine);
+    const updateLineToPc = useEditorProp(editorRef, lineToPc, setLineFilter);
+    const updateSetBreakpoints = useEditorProp(
+        editorRef,
+        setBreakpoints,
+        setSetBreakpoints
+    );
+
+    const onCreateEditor = useCallback(
+        (view: EditorView) => {
+            updateLine(view);
+            updateLineToPc(view);
+            updateSetBreakpoints(view);
+        },
+        [activeLine, lineToPc, setBreakpoints]
+    );
 
     const onEditorChange = useCallback(
         (val: string, _viewUpdate: ViewUpdate) => {
             onChange(val);
         },
-        []
+        [onChange]
     );
 
     const textColor = readOnly ? "var(--address)" : "var(--text)";
@@ -137,6 +151,7 @@ export default function Editor({
                 height="100%"
                 theme={theme}
                 extensions={extensions}
+                onCreateEditor={onCreateEditor}
                 options={{
                     viewportMargin: Infinity,
                 }}
@@ -151,12 +166,25 @@ function useEditorProp<T>(
     value: T,
     effect: StateEffectType<T>
 ) {
+    const updateCodemirror = useCallback(
+        (view: EditorView) => {
+            view.dispatch({
+                effects: effect.of(value),
+            });
+        },
+        [value]
+    );
+
     useEffect(() => {
         if (editorRef.current) {
             const view = editorRef.current.view;
-            view?.dispatch({
-                effects: effect.of(value),
-            });
+            if (view === undefined) {
+                return;
+            }
+
+            updateCodemirror(view);
         }
     }, [value]);
+
+    return updateCodemirror;
 }
