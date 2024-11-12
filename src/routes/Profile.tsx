@@ -114,6 +114,7 @@ export default function Profile({ username }: ProfileProps) {
                             <h3>Friend Requests</h3>
                             {friendRequests.map((username) => (
                                 <Friend
+                                    key={username}
                                     username={username}
                                     onResolveRequest={onResolveRequest}
                                 />
@@ -124,7 +125,7 @@ export default function Profile({ username }: ProfileProps) {
                         <FriendList>
                             <h3>Friends</h3>
                             {friends.map((username) => (
-                                <Friend username={username} />
+                                <Friend key={username} username={username} />
                             ))}
                         </FriendList>
                     )}

@@ -188,7 +188,7 @@ export default function Play() {
                 <DocsViewer docs={docs}>
                     {docsList.map(([label, items]) => {
                         return (
-                            <Collapsible title={label}>
+                            <Collapsible key={label} title={label}>
                                 <DocsList items={items} />
                             </Collapsible>
                         );
