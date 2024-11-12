@@ -194,7 +194,6 @@ const updateReactBreakpoints = EditorView.updateListener.of((update) => {
     const breakpoints = update.state.field(breakpointField);
     if (breakpoints !== update.startState.field(breakpointField)) {
         const setBreakpoints = update.state.field(setBreakpointsField);
-        console.log(setBreakpoints);
         setBreakpoints(rangesToLines(update.state.doc, breakpoints));
     }
 });
