@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 import { NavLink } from "react-router-dom";
 
-const buttonBaseStyles = `
+const buttonBaseStyles = () => `
     display: inline-block;
     color: var(--text);
     padding: 8px;
@@ -36,15 +36,18 @@ export const NavButton = styled(NavLink)`
     }
 `;
 
-export const GhostButton = styled(ButtonBase)`
+export const GhostButton = styled(ButtonBase)<{ $disable?: boolean }>`
     background-color: transparent;
+    color: ${({ $disable }) => ($disable ? "var(--address)" : "var(--text)")};
 
     &:hover {
-        background-color: var(--ghost-hover);
+        background-color: ${({ $disable }) =>
+            $disable ? "transparent" : "var(--ghost-hover)"};
     }
 
     &:active {
-        background-color: var(--ghost-click);
+        background-color: ${({ $disable }) =>
+            $disable ? "transparent" : "var(--ghost-click)"};
     }
 `;
 
