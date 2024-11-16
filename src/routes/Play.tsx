@@ -99,23 +99,20 @@ export default function Play() {
     const reloadCode = () => dispatch({ type: "reload" });
 
     const dispatchDebugger = (type: DebuggerCommandName) => {
-        if (program === undefined) {
-            if (!isProgramStarter(type)) {
-                return;
-            }
-
-            const newProgram = loadProgram(code);
-            if (
-                newProgram === undefined ||
-                newProgram.instructions.length <= 0
-            ) {
-                return;
-            }
-
-            dispatch({ type: "load-code", program: newProgram });
+        if (program !== undefined) {
+            dispatch({ type });
         }
 
-        dispatch({ type });
+        if (!isProgramStarter(type)) {
+            return;
+        }
+
+        const newProgram = loadProgram(code);
+        if (newProgram === undefined || newProgram.instructions.length <= 0) {
+            return;
+        }
+
+        dispatch({ type: "load-code", program: newProgram });
     };
 
     const play = state.play;

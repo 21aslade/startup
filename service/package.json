@@ -1,0 +1,20 @@
+{
+    "name": "linebreak-service",
+    "version": "0.0.0",
+    "type": "module",
+    "description": "Backend services for linebreak",
+    "main": "index.js",
+    "scripts": {
+        "dev": "tsc && node dist/index.js"
+    },
+    "author": "21aslade",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.21.1",
+        "uuid": "^11.0.3"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "typescript": "^5.6.3"
+    }
+}

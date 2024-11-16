@@ -1,4 +1,4 @@
-// Icons sourced from https://www.svgrepo.com
+// Icons sourced from https://www.svgrepo.com under the MIT license
 const iconSize = "20px";
 const fill = "#ffffff";
 
