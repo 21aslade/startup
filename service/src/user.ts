@@ -3,16 +3,12 @@ export type UserCredentials = {
     password: string;
 };
 
-export type User = {
-    credentials: UserCredentials;
-    statistics: Statistics;
-    friendRequests: string[];
-    friends: string[];
-};
+export type User = Profile & { password: string };
 
 export type Profile = {
     username: string;
     statistics: Statistics;
+    friends: string[];
 };
 
 export type Statistics = {
@@ -42,12 +38,9 @@ export function isUser(obj: unknown): obj is User {
     return (
         typeof obj === "object" &&
         obj !== null &&
-        isUserCredentials((obj as User).credentials) &&
-        isStatistics((obj as User).statistics) &&
-        Array.isArray((obj as User).friendRequests) &&
-        (obj as User).friendRequests.every((s) => typeof s === "string") &&
-        Array.isArray((obj as User).friends) &&
-        (obj as User).friends.every((s) => typeof s === "string")
+        typeof (obj as User).username === "string" &&
+        typeof (obj as User).password === "string" &&
+        isStatistics((obj as User).statistics)
     );
 }
 

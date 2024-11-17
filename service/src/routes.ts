@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 
 const users: Map<string, User> = new Map();
 let auth: Map<string, Session> = new Map();
+const friendRequests: Map<string, string[]> = new Map();
 
 // auth tokens last for one week
 const tokenDuration = 7 * 24 * 60 * 60 * 1000;
@@ -14,9 +15,9 @@ export function createUser(body: UserCredentials): AuthToken {
     }
 
     const user: User = {
-        credentials: body,
+        username: body.username,
+        password: body.password,
         statistics: { wins: 0, plays: 0 },
-        friendRequests: [],
         friends: [],
     };
     users.set(body.username, user);
@@ -28,11 +29,7 @@ export function deleteUser(
     { token }: AuthToken,
     params: { user: string }
 ): void {
-    const { username } = requireAuth(token);
-
-    if (username !== params.user) {
-        throw new RouteException(401, "Unauthorized");
-    }
+    const { username } = requireUserAuth(params.user, token);
 
     if (!users.has(username)) {
         throw new RouteException(404, "User does not exist");
@@ -46,14 +43,14 @@ export function deleteUser(
 
 export function getProfile(_body: void, params: { user: string }): Profile {
     const username = params.user;
-    const { statistics } = users.get(username);
+    const { password: _, ...profile } = users.get(username);
 
-    return { username, statistics };
+    return profile;
 }
 
 export function login(body: UserCredentials): AuthToken {
     const user = users.get(body.username);
-    if (user === undefined || body.password !== user.credentials.password) {
+    if (user === undefined || body.password !== user.password) {
         throw new RouteException(401, "Incorrect username or password");
     }
 
@@ -63,6 +60,27 @@ export function login(body: UserCredentials): AuthToken {
 export function logout({ token }: AuthToken): void {
     requireAuth(token);
     auth.delete(token);
+}
+
+export function friendRequest(
+    { token }: AuthToken,
+    params: { user: string; other: string }
+): void {
+    requireUserAuth(params.user, token);
+
+    const user = users.get(params.user);
+    const other = users.get(params.other);
+
+    if (!user.friends.includes(params.other)) {
+        user.friends.push(params.other);
+    }
+
+    if (!other.friends.includes(params.user)) {
+        const otherRequests = friendRequests.get(params.user);
+        if (!otherRequests.includes(params.user)) {
+            otherRequests.push(params.user);
+        }
+    }
 }
 
 function createSession(username: string): AuthToken {
@@ -82,6 +100,15 @@ function requireAuth(token: string): Session {
     const session = auth.get(token);
     const now = Date.now();
     if (session === undefined || session.expiresAt < now) {
+        throw new RouteException(401, "Unauthorized");
+    }
+
+    return session;
+}
+
+function requireUserAuth(user: string, token: string): Session {
+    const session = requireAuth(token);
+    if (user !== session.username) {
         throw new RouteException(401, "Unauthorized");
     }
 

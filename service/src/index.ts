@@ -2,7 +2,14 @@ import express from "express";
 import * as uuid from "uuid";
 import { isAuthToken, isUserCredentials } from "./user.js";
 import { RouteException, routeHandler } from "./handler.js";
-import { createUser, deleteUser, getProfile, login, logout } from "./routes.js";
+import {
+    createUser,
+    deleteUser,
+    friendRequest,
+    getProfile,
+    login,
+    logout,
+} from "./routes.js";
 
 const app = express();
 
@@ -25,6 +32,10 @@ apiRouter.delete("/user/:user", (req, res, next) =>
 
 apiRouter.get("/user/:user", (req, res, next) =>
     routeHandler(req, res, next, getProfile, (o) => typeof o === "undefined")
+);
+
+apiRouter.put("/user/:user/friend/:other", (req, res, next) =>
+    routeHandler(req, res, next, friendRequest, isAuthToken)
 );
 
 apiRouter.post("/session", (req, res, next) =>
