@@ -11,7 +11,7 @@ import {
 import { RouteException, routeHandler } from "./handler.js";
 
 const users: Map<string, User> = new Map();
-const auth: Map<string, Session> = new Map();
+let auth: Map<string, Session> = new Map();
 
 // auth tokens last for one week
 const tokenDuration = 7 * 24 * 60 * 60 * 1000;
@@ -28,7 +28,7 @@ const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
 apiRouter.post(
-    "/user/:username",
+    "/user",
     routeHandler((req, res) => {
         if (users.get(req.body.username) !== undefined) {
             res.status(409).send({ msg: "Username already taken" });
@@ -51,9 +51,19 @@ apiRouter.delete(
     "/user",
     routeHandler((req, res) => {
         const authToken = req.body.token;
-        const session = requireAuth(authToken);
+        const { username } = requireAuth(authToken);
 
-        users.delete(session.username);
+        if (!users.has(username)) {
+            res.status(404).end();
+            return;
+        }
+
+        users.delete(username);
+        auth = new Map(
+            auth
+                .entries()
+                .filter(([_, session]) => session.username !== username)
+        );
 
         res.status(204).end();
     }, isAuthToken)
