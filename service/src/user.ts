@@ -10,6 +10,11 @@ export type User = {
     friends: string[];
 };
 
+export type Profile = {
+    username: string;
+    statistics: Statistics;
+};
+
 export type Statistics = {
     wins: number;
     plays: number;
@@ -60,5 +65,13 @@ export function isAuthToken(obj: unknown): obj is AuthToken {
         typeof obj === "object" &&
         obj !== null &&
         typeof (obj as AuthToken).token === "string"
+    );
+}
+
+export function isProfile(obj: unknown): obj is Profile {
+    return (
+        typeof obj === "object" &&
+        typeof (obj as Profile)?.username === "string" &&
+        isStatistics((obj as Profile).statistics)
     );
 }

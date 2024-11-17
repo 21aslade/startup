@@ -69,6 +69,13 @@ apiRouter.delete(
     }, isAuthToken)
 );
 
+apiRouter.get("/user/:user", (req, res) => {
+    const username = req.params.user;
+    const { statistics } = users.get(username);
+
+    res.status(200).end({ username, statistics });
+});
+
 apiRouter.post(
     "/session",
     routeHandler((req, res) => {
