@@ -5,7 +5,7 @@
     "description": "Backend services for linebreak",
     "main": "dist/user.js",
     "scripts": {
-        "dev": "tsc && node dist/user.js"
+        "dev": "tsc && node dist/index.js"
     },
     "author": "21aslade",
     "license": "MIT",
