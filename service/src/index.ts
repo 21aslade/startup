@@ -1,6 +1,7 @@
 import express from "express";
 import * as uuid from "uuid";
 import {
+    AuthToken,
     isAuthToken,
     isUserCredentials,
     Session,
@@ -42,16 +43,7 @@ apiRouter.post(
         };
         users.set(req.body.username, user);
 
-        const now = Date.now();
-        const session: Session = {
-            expiresAt: now + tokenDuration,
-            username: req.body.username,
-        };
-
-        const token = uuid.v4();
-        auth.set(token, session);
-
-        res.send({ token });
+        res.end(createSession(req.body.username));
     }, isUserCredentials)
 );
 
@@ -59,14 +51,33 @@ apiRouter.delete(
     "/user",
     routeHandler((req, res) => {
         const authToken = req.body.token;
-        const session = auth.get(authToken);
-        const now = Date.now();
-        if (session === undefined || session.expiresAt < now) {
-            throw new RouteException(401, "Unauthorized");
-        }
+        const session = requireAuth(authToken);
 
         users.delete(session.username);
 
+        res.status(204).end();
+    }, isAuthToken)
+);
+
+apiRouter.post(
+    "/session",
+    routeHandler((req, res) => {
+        const user = users.get(req.body.username);
+        if (req.body.password !== user.credentials.password) {
+            throw new RouteException(401, "Unauthorized");
+        }
+
+        res.end(createSession(req.body.username));
+    }, isUserCredentials)
+);
+
+apiRouter.delete(
+    "/session",
+    routeHandler((req, res) => {
+        const authToken = req.body.token;
+        requireAuth(authToken);
+
+        auth.delete(authToken);
         res.status(204).end();
     }, isAuthToken)
 );
@@ -78,3 +89,26 @@ app.use((_req, res) => {
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
+
+function createSession(username: string): AuthToken {
+    const now = Date.now();
+    const session: Session = {
+        expiresAt: now + tokenDuration,
+        username,
+    };
+
+    const token = uuid.v4();
+    auth.set(token, session);
+
+    return { token };
+}
+
+function requireAuth(token: string): Session {
+    const session = auth.get(token);
+    const now = Date.now();
+    if (session === undefined || session.expiresAt < now) {
+        throw new RouteException(401, "Unauthorized");
+    }
+
+    return session;
+}
