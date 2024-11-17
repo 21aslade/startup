@@ -53,7 +53,7 @@ export function getProfile(_body: void, params: { user: string }): Profile {
 
 export function login(body: UserCredentials): AuthToken {
     const user = users.get(body.username);
-    if (body.password !== user.credentials.password) {
+    if (user === undefined || body.password !== user.credentials.password) {
         throw new RouteException(401, "Incorrect username or password");
     }
 
