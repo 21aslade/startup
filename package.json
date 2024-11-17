@@ -3,8 +3,13 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
+    "workspaces": {
+        "packages": [
+            "service"
+        ]
+    },
     "scripts": {
-        "dev": "vite",
+        "dev": "vite & npm run -w=service dev",
         "build": "vite build",
         "lint": "eslint .",
         "preview": "vite preview"
