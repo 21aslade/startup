@@ -7,7 +7,7 @@ import {
     User,
     UserCredentials,
 } from "./user.js";
-import { routeHandler } from "./handler.js";
+import { RouteException, routeHandler } from "./handler.js";
 
 const users: Map<string, User> = new Map();
 const auth: Map<string, Session> = new Map();
@@ -53,6 +53,22 @@ apiRouter.post(
 
         res.send({ token });
     }, isUserCredentials)
+);
+
+apiRouter.delete(
+    "/user",
+    routeHandler((req, res) => {
+        const authToken = req.body.token;
+        const session = auth.get(authToken);
+        const now = Date.now();
+        if (session === undefined || session.expiresAt < now) {
+            throw new RouteException(401, "Unauthorized");
+        }
+
+        users.delete(session.username);
+
+        res.status(204).end();
+    }, isAuthToken)
 );
 
 app.use((_req, res) => {
