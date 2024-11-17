@@ -9,7 +9,7 @@
         ]
     },
     "scripts": {
-        "dev": "vite & npm run -w=service dev",
+        "dev": "vite & npm run -w=service dev & wait",
         "build": "vite build",
         "lint": "eslint .",
         "preview": "vite preview"

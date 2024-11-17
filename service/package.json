@@ -3,9 +3,9 @@
     "version": "0.0.0",
     "type": "module",
     "description": "Backend services for linebreak",
-    "main": "index.js",
+    "main": "dist/user.js",
     "scripts": {
-        "dev": "swc src/* -d dist --strip-leading-paths && node dist/index.js"
+        "dev": "tsc && node dist/user.js"
     },
     "author": "21aslade",
     "license": "MIT",
@@ -14,8 +14,6 @@
         "uuid": "^11.0.3"
     },
     "devDependencies": {
-        "@swc/cli": "^0.5.0",
-        "@swc/core": "^1.9.2",
         "@types/express": "^5.0.0",
         "typescript": "^5.6.3"
     }
