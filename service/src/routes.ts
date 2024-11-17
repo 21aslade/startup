@@ -83,6 +83,26 @@ export function friendRequest(
     }
 }
 
+export function unfriend(
+    { token }: AuthToken,
+    params: { user: string; other: string }
+): void {
+    requireUserAuth(params.user, token);
+
+    const user = users.get(params.user);
+
+    const userIndex = user.friends.indexOf(params.other);
+    if (userIndex >= 0) {
+        user.friends.splice(userIndex, 1);
+    }
+
+    const otherRequests = friendRequests.get(params.user);
+    const otherIndex = otherRequests.indexOf(params.user);
+    if (otherIndex >= 0) {
+        otherRequests.splice(otherIndex, 1);
+    }
+}
+
 function createSession(username: string): AuthToken {
     const now = Date.now();
     const session: Session = {

@@ -9,6 +9,7 @@ import {
     getProfile,
     login,
     logout,
+    unfriend,
 } from "./routes.js";
 
 const app = express();
@@ -36,6 +37,10 @@ apiRouter.get("/user/:user", (req, res, next) =>
 
 apiRouter.put("/user/:user/friend/:other", (req, res, next) =>
     routeHandler(req, res, next, friendRequest, isAuthToken)
+);
+
+apiRouter.delete("/user/:user/friend/:other", (req, res, next) =>
+    routeHandler(req, res, next, unfriend, isAuthToken)
 );
 
 apiRouter.post("/session", (req, res, next) =>
