@@ -12,6 +12,7 @@ export async function createUser(
     const result = await fetch("/api/user", {
         method: "POST",
         body: JSON.stringify(credentials),
+        headers: { "content-type": "application/json" },
     });
 
     return handleResponse(result, isAuthToken);
@@ -25,6 +26,7 @@ export async function deleteUser(
     const result = await fetch(`/api/user/${uriUser}`, {
         method: "DELETE",
         body: JSON.stringify(token),
+        headers: { "content-type": "application/json" },
     });
 
     if (!result.ok) {
@@ -35,7 +37,9 @@ export async function deleteUser(
 
 export async function getProfile(user: string): Promise<Profile> {
     const uriUser = encodeURI(user);
-    const result = await fetch(`/api/user/${uriUser}`);
+    const result = await fetch(`/api/user/${uriUser}`, {
+        headers: { "content-type": "application/json" },
+    });
 
     return handleResponse(result, isProfile);
 }
@@ -50,6 +54,7 @@ export async function friendRequest(
     const result = await fetch(`/api/user/${uriUser}/friend/${uriOther}`, {
         method: "PUT",
         body: JSON.stringify(auth),
+        headers: { "content-type": "application/json" },
     });
 
     if (!result.ok) {
@@ -68,6 +73,7 @@ export async function unfriend(
     const result = await fetch(`/api/user/${uriUser}/friend/${uriOther}`, {
         method: "DELETE",
         body: JSON.stringify(auth),
+        headers: { "content-type": "application/json" },
     });
 
     if (!result.ok) {
@@ -80,6 +86,7 @@ export async function login(credentials: UserCredentials): Promise<AuthToken> {
     const result = await fetch("/api/session", {
         method: "POST",
         body: JSON.stringify(credentials),
+        headers: { "content-type": "application/json" },
     });
 
     return handleResponse(result, isAuthToken);
@@ -89,6 +96,7 @@ export async function logout(token: AuthToken): Promise<void> {
     const result = await fetch("/api/session", {
         method: "DELETE",
         body: JSON.stringify(token),
+        headers: { "content-type": "application/json" },
     });
 
     if (!result.ok) {
