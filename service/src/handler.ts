@@ -5,10 +5,6 @@ import {
     NextFunction,
 } from "express";
 
-type Response<U> = {
-    body: U;
-};
-
 type ErrorResponse = {
     error: string;
 };
@@ -17,7 +13,7 @@ type Guard<T> = (o: unknown) => o is T;
 type Handler<P, T, U> = (body: T, params: P) => U;
 
 export async function routeHandler<P, T, U, Q, L>(
-    req: Request<P, U, T, Q, L>,
+    req: Request<P, U, any, Q, L>,
     res: ExpressResponse<U | ErrorResponse, L>,
     next: NextFunction,
     handler: Handler<P, T, U>,
