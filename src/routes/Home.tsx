@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PrimaryButton, SecondaryButton } from "../components/Button.jsx";
 import { styled } from "styled-components";
+import { UserCredentials } from "linebreak-service";
 
 const Layout = styled.div`
     height: 100%;
@@ -47,7 +48,7 @@ const LoginInput = styled.input`
 
 type LoginProps = {
     loggedInUsername?: string;
-    onSubmit: (s: string) => void;
+    onSubmit: (c: UserCredentials, register: boolean) => void;
 };
 function Login({ onSubmit }: LoginProps) {
     const [username, setUsername] = useState("");
@@ -75,12 +76,21 @@ function Login({ onSubmit }: LoginProps) {
                 <PrimaryButton
                     onClick={() => {
                         if (username.length > 0 && password.length > 0) {
-                            onSubmit(username);
+                            onSubmit({ username, password }, false);
                         }
                     }}
                 >
                     Login
                 </PrimaryButton>
+                <SecondaryButton
+                    onClick={() => {
+                        if (username.length > 0 && password.length > 0) {
+                            onSubmit({ username, password }, true);
+                        }
+                    }}
+                >
+                    Register
+                </SecondaryButton>
             </div>
         </LoginWrapper>
     );
@@ -88,10 +98,11 @@ function Login({ onSubmit }: LoginProps) {
 
 export type HomeProps = {
     username?: string;
-    onLogin: (s: string | undefined) => void;
+    onLogin: (c: UserCredentials, r: boolean) => Promise<void>;
+    onLogout: () => Promise<void>;
 };
 
-export default function Home({ username, onLogin }: HomeProps) {
+export default function Home({ username, onLogin, onLogout }: HomeProps) {
     return (
         <Layout>
             <section>
@@ -121,7 +132,7 @@ export default function Home({ username, onLogin }: HomeProps) {
                 ) : (
                     <LoginWrapper>
                         <h3>Welcome back, {username}</h3>
-                        <SecondaryButton onClick={() => onLogin(undefined)}>
+                        <SecondaryButton onClick={onLogout}>
                             Logout
                         </SecondaryButton>
                     </LoginWrapper>
