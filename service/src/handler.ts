@@ -15,7 +15,6 @@ type Handler<P, T, U> = (body: T, params: P) => U;
 export async function routeHandler<P, T, U, Q, L>(
     req: Request<P, U, any, Q, L>,
     res: ExpressResponse<U | ErrorResponse, L>,
-    next: NextFunction,
     handler: Handler<P, T, U>,
     isBody: Guard<T>
 ): Promise<void> {
@@ -28,13 +27,13 @@ export async function routeHandler<P, T, U, Q, L>(
 
         const response = await handler(req.body, req.params);
         if (response !== undefined) {
-            res.status(200).end(response);
+            res.status(200).end(JSON.stringify(response));
         } else {
             res.status(204).end();
         }
     } catch (e: unknown) {
         if (e instanceof RouteException) {
-            res.status(e.status).end({ error: e.message });
+            res.status(e.status).end(JSON.stringify({ error: e.message }));
         } else {
             throw e;
         }

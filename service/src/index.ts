@@ -23,32 +23,32 @@ app.use(express.static("public"));
 const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
-apiRouter.post("/user", (req, res, next) =>
-    routeHandler(req, res, next, createUser, isUserCredentials)
+apiRouter.post("/user", (req, res) =>
+    routeHandler(req, res, createUser, isUserCredentials)
 );
 
-apiRouter.delete("/user/:user", (req, res, next) =>
-    routeHandler(req, res, next, deleteUser, isAuthToken)
+apiRouter.delete("/user/:user", (req, res) =>
+    routeHandler(req, res, deleteUser, isAuthToken)
 );
 
-apiRouter.get("/user/:user", (req, res, next) =>
-    routeHandler(req, res, next, getProfile, (o) => typeof o === "undefined")
+apiRouter.get("/user/:user", (req, res) =>
+    routeHandler(req, res, getProfile, (o) => typeof o === "undefined")
 );
 
-apiRouter.put("/user/:user/friend/:other", (req, res, next) =>
-    routeHandler(req, res, next, friendRequest, isAuthToken)
+apiRouter.put("/user/:user/friend/:other", (req, res) =>
+    routeHandler(req, res, friendRequest, isAuthToken)
 );
 
-apiRouter.delete("/user/:user/friend/:other", (req, res, next) =>
-    routeHandler(req, res, next, unfriend, isAuthToken)
+apiRouter.delete("/user/:user/friend/:other", (req, res) =>
+    routeHandler(req, res, unfriend, isAuthToken)
 );
 
-apiRouter.post("/session", (req, res, next) =>
-    routeHandler(req, res, next, login, isUserCredentials)
+apiRouter.post("/session", (req, res) =>
+    routeHandler(req, res, login, isUserCredentials)
 );
 
-apiRouter.delete("/session", (req, res, next) =>
-    routeHandler(req, res, next, logout, isAuthToken)
+apiRouter.delete("/session", (req, res) =>
+    routeHandler(req, res, logout, isAuthToken)
 );
 
 app.use((_req, res) => {
