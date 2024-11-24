@@ -77,6 +77,20 @@ function Statistics({ statistics }: { statistics: Statistics }) {
     );
 }
 
+function Permalink({ username }: { username: string }) {
+    const usernameUrl = encodeURIComponent(username);
+    const url = `https://startup.linebreak.click/profile/${usernameUrl}`;
+    const encodedUrl = encodeURIComponent(url);
+    return (
+        <FriendCode>
+            <h3>Profile Permalink:</h3>
+            <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodedUrl}`}
+            />
+        </FriendCode>
+    );
+}
+
 export default function Profile() {
     const navigate = useNavigate();
     const username = useParams()["username"];
@@ -103,10 +117,7 @@ export default function Profile() {
                     <Statistics statistics={statistics} />
                 )}
                 <FriendsWrapper>
-                    <FriendCode>
-                        <h3>Friend Code:</h3>
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fstartup.linebreak.click%2Fplay.html" />
-                    </FriendCode>
+                    {username && <Permalink username={username} />}
                     {friends.length > 0 && (
                         <FriendList>
                             <h3>Friends</h3>
