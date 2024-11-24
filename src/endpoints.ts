@@ -22,7 +22,7 @@ export async function deleteUser(
     token: AuthToken,
     user: string
 ): Promise<void> {
-    const uriUser = encodeURI(user);
+    const uriUser = encodeURIComponent(user);
     const result = await fetch(`/api/user/${uriUser}`, {
         method: "DELETE",
         body: JSON.stringify(token),
@@ -36,7 +36,7 @@ export async function deleteUser(
 }
 
 export async function getProfile(user: string): Promise<Profile> {
-    const uriUser = encodeURI(user);
+    const uriUser = encodeURIComponent(user);
     const result = await fetch(`/api/user/${uriUser}`);
 
     return handleResponse(result, isProfile);
@@ -47,8 +47,8 @@ export async function friendRequest(
     user: string,
     other: string
 ): Promise<void> {
-    const uriUser = encodeURI(user);
-    const uriOther = encodeURI(other);
+    const uriUser = encodeURIComponent(user);
+    const uriOther = encodeURIComponent(other);
     const result = await fetch(`/api/user/${uriUser}/friend/${uriOther}`, {
         method: "PUT",
         body: JSON.stringify(auth),
@@ -66,8 +66,8 @@ export async function unfriend(
     user: string,
     other: string
 ): Promise<void> {
-    const uriUser = encodeURI(user);
-    const uriOther = encodeURI(other);
+    const uriUser = encodeURIComponent(user);
+    const uriOther = encodeURIComponent(other);
     const result = await fetch(`/api/user/${uriUser}/friend/${uriOther}`, {
         method: "DELETE",
         body: JSON.stringify(auth),
