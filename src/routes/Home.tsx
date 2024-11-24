@@ -2,6 +2,8 @@ import { useState } from "react";
 import { PrimaryButton, SecondaryButton } from "../components/Button.jsx";
 import { styled } from "styled-components";
 import { UserCredentials } from "linebreak-service";
+import { ServerError } from "../endpoints.js";
+import ErrorMessage from "../components/ErrorMessage.jsx";
 
 const Layout = styled.div`
     height: 100%;
@@ -46,16 +48,49 @@ const LoginInput = styled.input`
     font-size: 1.1rem;
 `;
 
+const ErrorWrapper = styled.div`
+    max-width: 100%;
+`;
+
 type LoginProps = {
     loggedInUsername?: string;
-    onSubmit: (c: UserCredentials, register: boolean) => void;
+    onSubmit: (c: UserCredentials, register: boolean) => Promise<void>;
 };
 function Login({ onSubmit }: LoginProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState<string | undefined>(undefined);
+
+    const submit = async (register: boolean) => {
+        if (username.length > 0 && password.length > 0) {
+            try {
+                await onSubmit({ username, password }, register);
+            } catch (e: unknown) {
+                if (!(e instanceof ServerError)) {
+                    throw e;
+                }
+
+                switch (e.status) {
+                    case 409:
+                        setError("Username already taken");
+                        break;
+                    case 401:
+                        setError("Username or password is incorrect");
+                        break;
+                }
+            }
+        } else {
+            setError("Username and password are required.");
+        }
+    };
 
     return (
         <LoginWrapper>
+            {error !== undefined && (
+                <ErrorWrapper>
+                    <ErrorMessage message={error} />
+                </ErrorWrapper>
+            )}
             <LoginInput
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -73,22 +108,10 @@ function Login({ onSubmit }: LoginProps) {
                 placeholder="Password"
             />
             <div>
-                <PrimaryButton
-                    onClick={() => {
-                        if (username.length > 0 && password.length > 0) {
-                            onSubmit({ username, password }, false);
-                        }
-                    }}
-                >
+                <PrimaryButton onClick={() => submit(false)}>
                     Login
                 </PrimaryButton>
-                <SecondaryButton
-                    onClick={() => {
-                        if (username.length > 0 && password.length > 0) {
-                            onSubmit({ username, password }, true);
-                        }
-                    }}
-                >
+                <SecondaryButton onClick={() => submit(true)}>
                     Register
                 </SecondaryButton>
             </div>

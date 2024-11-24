@@ -10,6 +10,7 @@
     --ghost-click: #ffffff22;
     --border: #ffffff33;
     --address: #aaaaaa;
+    --error: #75232d;
 
     color: var(--text);
     font-family: sans-serif;
