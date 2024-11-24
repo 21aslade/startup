@@ -108,7 +108,6 @@ export default function Profile() {
             .then(setProfile)
             .catch((e: unknown) => {
                 if (e instanceof ServerError && e.status === 404) {
-                    console.log("Nulled");
                     setProfile(null);
                 } else {
                     navigate("/");

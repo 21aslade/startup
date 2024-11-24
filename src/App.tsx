@@ -15,8 +15,21 @@ import {
 } from "./session.jsx";
 import NotFound from "./routes/NotFound.jsx";
 
+const sessionStorageKey = "session";
+
 export default function App() {
-    const [session, setSession] = useState<Session | undefined>(undefined);
+    const [session, setSession] = useState<Session | undefined>(() => {
+        const session = localStorage.getItem(sessionStorageKey);
+        if (session === null) {
+            return undefined;
+        }
+
+        try {
+            return JSON.parse(session);
+        } catch (e) {
+            return undefined;
+        }
+    });
 
     return (
         <BrowserRouter>
@@ -38,14 +51,17 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
 
     const onLogin = async (c: UserCredentials, register: boolean) => {
         const auth = await (register ? createUser(c) : login(c));
-        setSession({ username: c.username, auth });
+        const session = { username: c.username, auth };
+        localStorage.setItem(sessionStorageKey, JSON.stringify(session));
+        setSession(session);
         navigate("/profile");
     };
 
     const onLogout = async () => {
         if (session !== undefined) {
-            await logout(session.auth);
+            await logout(session.auth).catch(() => {});
             setSession(undefined);
+            localStorage.removeItem(sessionStorageKey);
         }
     };
 
