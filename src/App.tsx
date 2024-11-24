@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
 import Play from "./routes/Play.jsx";
 import Profile from "./routes/Profile.jsx";
@@ -81,7 +81,7 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
 function ProfileRedirect() {
     const navigate = useNavigate();
     const session = useSession();
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (session !== undefined) {
             const userURL = encodeURIComponent(session.username);
             console.log(userURL);

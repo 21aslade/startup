@@ -1,5 +1,10 @@
 import type { AuthToken } from "linebreak-service";
-import { createContext, PropsWithChildren, useContext, useEffect } from "react";
+import {
+    createContext,
+    PropsWithChildren,
+    useContext,
+    useLayoutEffect,
+} from "react";
 import { useNavigate } from "react-router-dom";
 
 export type Session = {
@@ -16,7 +21,7 @@ type RequireAuthProps = PropsWithChildren<{
 export function RequireAuth({ backupRoute, children }: RequireAuthProps) {
     const session = useSession();
     const navigate = useNavigate();
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (session === undefined && backupRoute !== undefined) {
             navigate(backupRoute);
             return;
