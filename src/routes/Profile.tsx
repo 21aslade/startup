@@ -3,6 +3,7 @@ import Friend from "../components/Friend.jsx";
 import type { Profile, Statistics } from "linebreak-service";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Wrapper = styled.div`
     padding: 0 24px;
@@ -50,10 +51,6 @@ const FriendCode = styled.div`
     width: fit-content;
 `;
 
-export type ProfileProps = {
-    username: string;
-};
-
 function Statistics({ statistics }: { statistics: Statistics }) {
     const winPercentage =
         statistics.plays > 0
@@ -80,11 +77,19 @@ function Statistics({ statistics }: { statistics: Statistics }) {
     );
 }
 
-export default function Profile({ username }: ProfileProps) {
+export default function Profile() {
+    const navigate = useNavigate();
+    const username = useParams()["username"];
     const [profile, setProfile] = useState<Profile | undefined>(undefined);
 
     useEffect(() => {
-        getProfile(username).then(setProfile);
+        if (username === undefined) {
+            navigate("/profile");
+            return;
+        }
+        getProfile(username)
+            .then(setProfile)
+            .catch(() => navigate("/"));
     }, [username]);
 
     const friends = profile?.friends ?? [];

@@ -1,17 +1,18 @@
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
 import Play from "./routes/Play.jsx";
 import Profile from "./routes/Profile.jsx";
-import { AuthToken, UserCredentials } from "linebreak-service";
+import { UserCredentials } from "linebreak-service";
 import { createUser, login, logout } from "./endpoints.js";
-
-type Session = {
-    auth: AuthToken;
-    username: string;
-};
+import {
+    RequireAuth,
+    Session,
+    SessionProvider,
+    useSession,
+} from "./session.jsx";
 
 export default function App() {
     const [session, setSession] = useState<Session | undefined>(undefined);
@@ -47,57 +48,48 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
         }
     };
 
-    const authenticated = session !== undefined;
-
     return (
-        <Routes>
-            <Route
-                path="/"
-                element={
-                    <Home
-                        onLogin={onLogin}
-                        onLogout={onLogout}
-                        username={session?.username}
-                    />
-                }
-            />
-            <Route
-                path="/profile"
-                element={
-                    <RequireAuth authenticated={authenticated} backupRoute="/">
-                        <Profile username={session?.username!!} />
-                    </RequireAuth>
-                }
-            />
-            <Route
-                path="/play"
-                element={
-                    <RequireAuth authenticated={authenticated} backupRoute="/">
-                        <Play />
-                    </RequireAuth>
-                }
-            />
-        </Routes>
+        <SessionProvider value={session}>
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <Home
+                            onLogin={onLogin}
+                            onLogout={onLogout}
+                            username={session?.username}
+                        />
+                    }
+                />
+                <Route path="/profile">
+                    <Route index element={<ProfileRedirect />}></Route>
+                    <Route path=":username" element={<Profile />}></Route>
+                </Route>
+                <Route
+                    path="/play"
+                    element={
+                        <RequireAuth backupRoute="/">
+                            <Play />
+                        </RequireAuth>
+                    }
+                />
+            </Routes>
+        </SessionProvider>
     );
 }
 
-type RequireAuthProps = PropsWithChildren<{
-    authenticated: boolean;
-    backupRoute: string;
-}>;
-
-function RequireAuth({
-    authenticated,
-    backupRoute,
-    children,
-}: RequireAuthProps) {
+function ProfileRedirect() {
     const navigate = useNavigate();
+    const session = useSession();
     useEffect(() => {
-        if (!authenticated) {
-            navigate(backupRoute);
-            return;
+        if (session !== undefined) {
+            const userURL = encodeURIComponent(session.username);
+            console.log(userURL);
+            navigate(`/profile/${userURL}`);
+        } else {
+            navigate("/");
         }
-    }, [authenticated]);
+    }, [session]);
 
-    return authenticated ? <>{children}</> : <></>;
+    return <></>;
 }
