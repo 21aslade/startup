@@ -88,18 +88,7 @@ export default function Profile({ username }: ProfileProps) {
     }, [username]);
 
     const friends = profile?.friends ?? [];
-
-    const [friendRequests, setFriendRequests] = useState<string[]>([
-        "Ralph Jung",
-        "jonhoo",
-    ]);
-
     const statistics = profile?.statistics;
-
-    const onResolveRequest = (username: string, accept: boolean) => {
-        const newFriendRequests = friendRequests.filter((f) => f !== username);
-        setFriendRequests(newFriendRequests);
-    };
 
     return (
         <Wrapper>
@@ -113,18 +102,6 @@ export default function Profile({ username }: ProfileProps) {
                         <h3>Friend Code:</h3>
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fstartup.linebreak.click%2Fplay.html" />
                     </FriendCode>
-                    {friendRequests.length > 0 && (
-                        <FriendList>
-                            <h3>Friend Requests</h3>
-                            {friendRequests.map((username) => (
-                                <Friend
-                                    key={username}
-                                    username={username}
-                                    onResolveRequest={onResolveRequest}
-                                />
-                            ))}
-                        </FriendList>
-                    )}
                     {friends.length > 0 && (
                         <FriendList>
                             <h3>Friends</h3>

@@ -4,7 +4,6 @@ import { v4 as uuid } from "uuid";
 
 const users: Map<string, User> = new Map();
 let auth: Map<string, Session> = new Map();
-const friendRequests: Map<string, string[]> = new Map();
 
 // auth tokens last for one week
 const tokenDuration = 7 * 24 * 60 * 60 * 1000;
@@ -74,13 +73,6 @@ export function friendRequest(
     if (!user.friends.includes(params.other)) {
         user.friends.push(params.other);
     }
-
-    if (!other.friends.includes(params.user)) {
-        const otherRequests = friendRequests.get(params.user);
-        if (!otherRequests.includes(params.user)) {
-            otherRequests.push(params.user);
-        }
-    }
 }
 
 export function unfriend(
@@ -94,12 +86,6 @@ export function unfriend(
     const userIndex = user.friends.indexOf(params.other);
     if (userIndex >= 0) {
         user.friends.splice(userIndex, 1);
-    }
-
-    const otherRequests = friendRequests.get(params.user);
-    const otherIndex = otherRequests.indexOf(params.user);
-    if (otherIndex >= 0) {
-        otherRequests.splice(otherIndex, 1);
     }
 }
 

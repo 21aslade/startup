@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import { styled } from "styled-components";
-import { PrimaryButton, SecondaryButton } from "./Button.jsx";
 
 const FriendWrapper = styled.div`
     display: flex;
@@ -29,27 +28,13 @@ const FriendName = styled(NavLink)`
 
 export type FriendProps = {
     username: string;
-    onResolveRequest?: (username: string, accept: boolean) => void;
 };
 
-export default function Friend({ username, onResolveRequest }: FriendProps) {
+export default function Friend({ username }: FriendProps) {
+    const usernameUrl = encodeURIComponent(username);
     return (
         <FriendWrapper className="friend">
-            <FriendName to="/profile">{username}</FriendName>
-            {onResolveRequest !== undefined && (
-                <div>
-                    <PrimaryButton
-                        onClick={() => onResolveRequest(username, true)}
-                    >
-                        Accept
-                    </PrimaryButton>
-                    <SecondaryButton
-                        onClick={() => onResolveRequest(username, false)}
-                    >
-                        Reject
-                    </SecondaryButton>
-                </div>
-            )}
+            <FriendName to={`/profile/${usernameUrl}`}>{username}</FriendName>
         </FriendWrapper>
     );
 }
