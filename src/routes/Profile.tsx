@@ -1,9 +1,10 @@
-import { getProfile } from "../endpoints.js";
+import { getProfile, ServerError } from "../endpoints.js";
 import Friend from "../components/Friend.jsx";
 import type { Profile, Statistics } from "linebreak-service";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
+import NotFound from "./NotFound.jsx";
 
 const Wrapper = styled.div`
     padding: 0 24px;
@@ -94,17 +95,30 @@ function Permalink({ username }: { username: string }) {
 export default function Profile() {
     const navigate = useNavigate();
     const username = useParams()["username"];
-    const [profile, setProfile] = useState<Profile | undefined>(undefined);
+    const [profile, setProfile] = useState<Profile | null | undefined>(
+        undefined
+    );
 
     useEffect(() => {
         if (username === undefined) {
-            navigate("/profile");
+            navigate("/");
             return;
         }
         getProfile(username)
             .then(setProfile)
-            .catch(() => navigate("/"));
+            .catch((e: unknown) => {
+                if (e instanceof ServerError && e.status === 404) {
+                    console.log("Nulled");
+                    setProfile(null);
+                } else {
+                    navigate("/");
+                }
+            });
     }, [username]);
+
+    if (profile === null) {
+        return <NotFound />;
+    }
 
     const friends = profile?.friends ?? [];
     const statistics = profile?.statistics;

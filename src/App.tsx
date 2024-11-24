@@ -13,6 +13,7 @@ import {
     SessionProvider,
     useSession,
 } from "./session.jsx";
+import NotFound from "./routes/NotFound.jsx";
 
 export default function App() {
     const [session, setSession] = useState<Session | undefined>(undefined);
@@ -51,6 +52,7 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
     return (
         <SessionProvider value={session}>
             <Routes>
+                <Route path="*" element={<NotFound />} />
                 <Route
                     path="/"
                     element={

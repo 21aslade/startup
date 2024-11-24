@@ -42,6 +42,10 @@ export function deleteUser(
 
 export function getProfile(params: { user: string }): Profile {
     const username = params.user;
+    const user = users.get(username);
+    if (user === undefined) {
+        throw new RouteException(404, "User not found");
+    }
     const { password: _, ...profile } = users.get(username);
 
     return profile;
@@ -68,7 +72,6 @@ export function friendRequest(
     requireUserAuth(params.user, token);
 
     const user = users.get(params.user);
-    const other = users.get(params.other);
 
     if (!user.friends.includes(params.other)) {
         user.friends.push(params.other);

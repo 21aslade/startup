@@ -103,6 +103,15 @@ export async function logout(token: AuthToken): Promise<void> {
     }
 }
 
+export class ServerError extends Error {
+    status: number;
+
+    constructor(status: number, message: string) {
+        super(message);
+        this.status = status;
+    }
+}
+
 async function handleResponse<T>(
     res: Response,
     guard: (o: unknown) => o is T
@@ -113,11 +122,12 @@ async function handleResponse<T>(
             return body;
         } else {
             const bodyText = JSON.stringify(body, null, 2);
-            throw new Error(
+            throw new ServerError(
+                res.status,
                 `Request failed: code ${res.status} body ${bodyText}`
             );
         }
     } catch (e) {
-        throw new Error(`Request failed: code ${res.status}`);
+        throw new ServerError(res.status, `Request failed: code ${res.status}`);
     }
 }
