@@ -32,7 +32,12 @@ apiRouter.delete("/user/:user", (req, res) =>
 );
 
 apiRouter.get("/user/:user", (req, res) =>
-    routeHandler(req, res, getProfile, (o) => typeof o === "undefined")
+    routeHandler(
+        req,
+        res,
+        (_, p) => getProfile(p),
+        (o) => typeof o === "object"
+    )
 );
 
 apiRouter.put("/user/:user/friend/:other", (req, res) =>

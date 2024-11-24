@@ -41,7 +41,7 @@ export function deleteUser(
     );
 }
 
-export function getProfile(_body: void, params: { user: string }): Profile {
+export function getProfile(params: { user: string }): Profile {
     const username = params.user;
     const { password: _, ...profile } = users.get(username);
 

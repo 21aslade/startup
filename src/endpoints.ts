@@ -37,9 +37,7 @@ export async function deleteUser(
 
 export async function getProfile(user: string): Promise<Profile> {
     const uriUser = encodeURI(user);
-    const result = await fetch(`/api/user/${uriUser}`, {
-        headers: { "content-type": "application/json" },
-    });
+    const result = await fetch(`/api/user/${uriUser}`);
 
     return handleResponse(result, isProfile);
 }
