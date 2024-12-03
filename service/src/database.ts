@@ -29,6 +29,15 @@ export function initializeDBClient(config: DBConfig): DataAccess {
     const users = db.collection<User>("users");
     const auth = db.collection<Auth>("auth");
 
+    users.createIndex(
+        { username: 1 },
+        {
+            unique: true,
+        }
+    );
+
+    auth.createIndex({ token: 1 }, { unique: true });
+
     return {
         async getUser(username: string) {
             return (await users.findOne({ username })) ?? undefined;
@@ -39,6 +48,7 @@ export function initializeDBClient(config: DBConfig): DataAccess {
             });
         },
         async deleteUser(username: string) {
+            await auth.deleteMany({ session: { username } });
             await users.deleteOne({ username });
         },
 
