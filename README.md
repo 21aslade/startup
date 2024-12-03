@@ -92,6 +92,19 @@ For this deliverable I added backend endpoints for creating profiles and followi
 -   [x] **Backend service endpoints** - login, following. I didn't realize that we didn't need any login stuff until the next deliverable. All other functionality is tied to websockets
 -   [x] **Frontend calls service endpoints** - done!
 
+## Startup Login
+
+For this deliverable I hooked the login system up to the database and switched to using cookies
+
+-   [x] **MongoDB Atlas Database created** - done!
+-   [x] **Stores data in MongoDB** - done!
+-   [x] **User registration** - creates a new account in the database
+-   [x] **Existing user** - existing users can follow other users
+-   [x] **Use MongDB to store credentials** - stores user, hashes passwords
+-   [x] **Restricts functionality** - backend and frontend both require login to follow friend
+
+(All this stuff was done today, cause there wasn't too much to do!)
+
 ## Dependencies
 
 I use a number of dependencies in this project; I wrote some of them, but others are external:
