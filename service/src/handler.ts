@@ -19,6 +19,7 @@ export type HandlerResponse<U> = {
 type Guard<T> = (o: unknown) => o is T;
 type Handler<P, T, U> = (
     data: DataAccess,
+    cookies: Record<string, string>,
     body: T,
     params: P
 ) => Promise<HandlerResponse<U>>;
@@ -39,6 +40,7 @@ export async function routeHandler<P, T, U, Q, L>(
 
         const { body: response, cookie } = await handler(
             data,
+            req.cookies,
             req.body,
             req.params
         );

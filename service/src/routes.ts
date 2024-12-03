@@ -1,6 +1,6 @@
 import { DataAccess } from "./database.js";
 import { HandlerResponse, RouteException } from "./handler.js";
-import { AuthToken, Profile, Session, User, UserCredentials } from "./user.js";
+import { Profile, Session, User, UserCredentials } from "./user.js";
 import { v4 as uuid } from "uuid";
 import * as bcrypt from "bcrypt";
 
@@ -31,10 +31,10 @@ export async function createUser(
 
 export async function deleteUser(
     data: DataAccess,
-    { token }: AuthToken,
+    cookies: Record<string, string>,
     params: { user: string }
 ): Promise<HandlerResponse<void>> {
-    const { username } = await requireUserAuth(data, params.user, token);
+    const { username } = await requireUserAuth(data, params.user, cookies);
 
     if ((await data.getUser(username)) === undefined) {
         throw new RouteException(404, "User does not exist");
@@ -76,19 +76,23 @@ export async function login(
 
 export async function logout(
     data: DataAccess,
-    { token }: AuthToken
+    cookies: Record<string, string>
 ): Promise<HandlerResponse<void>> {
-    await requireAuth(data, token);
+    const token = cookies[authCookieKey];
+    if (token === undefined) {
+        throw new RouteException(401, "Unauthorized");
+    }
+    await requireAuth(data, cookies);
     await data.deleteSession(token);
-    return {};
+    return { cookie: { key: authCookieKey, value: undefined } };
 }
 
 export async function friendRequest(
     data: DataAccess,
-    { token }: AuthToken,
+    cookies: Record<string, string>,
     params: { user: string; other: string }
 ): Promise<HandlerResponse<void>> {
-    await requireUserAuth(data, params.user, token);
+    await requireUserAuth(data, params.user, cookies);
 
     const user = await data.getUser(params.user);
 
@@ -103,10 +107,10 @@ export async function friendRequest(
 
 export async function unfriend(
     data: DataAccess,
-    { token }: AuthToken,
+    cookies: Record<string, string>,
     params: { user: string; other: string }
 ): Promise<HandlerResponse<void>> {
-    await requireUserAuth(data, params.user, token);
+    await requireUserAuth(data, params.user, cookies);
 
     const user = await data.getUser(params.user);
 
@@ -144,7 +148,14 @@ async function createSession(
     };
 }
 
-async function requireAuth(data: DataAccess, token: string): Promise<Session> {
+async function requireAuth(
+    data: DataAccess,
+    cookies: Record<string, string>
+): Promise<Session> {
+    const token = cookies[authCookieKey];
+    if (token === undefined) {
+        throw new RouteException(401, "Unauthorized");
+    }
     const session = await data.getSession(token);
     const now = Date.now();
     if (session === undefined || session.expireAt < now) {
@@ -157,9 +168,9 @@ async function requireAuth(data: DataAccess, token: string): Promise<Session> {
 async function requireUserAuth(
     data: DataAccess,
     user: string,
-    token: string
+    cookies: Record<string, string>
 ): Promise<Session> {
-    const session = await requireAuth(data, token);
+    const session = await requireAuth(data, cookies);
     if (user !== session.username) {
         throw new RouteException(401, "Unauthorized");
     }

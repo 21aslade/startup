@@ -1,5 +1,5 @@
 import express from "express";
-import { isAuthToken, isUserCredentials } from "./user.js";
+import { isUserCredentials } from "./user.js";
 import { routeHandler } from "./handler.js";
 import {
     createUser,
@@ -12,10 +12,12 @@ import {
 } from "./routes.js";
 import { initializeDBClient, isDBConfig } from "./database.js";
 import * as fs from "node:fs/promises";
+import cookieParser from "cookie-parser";
 
 const dbConfig = JSON.parse(
     await fs.readFile("dbConfig.json", { encoding: "utf-8" })
 );
+
 if (!isDBConfig(dbConfig)) {
     throw new Error(
         "Failed to start service: database credentials are invalid"
@@ -28,6 +30,8 @@ const app = express();
 
 app.use(express.json());
 
+app.use(cookieParser());
+
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
 app.use(express.static("public"));
@@ -36,37 +40,43 @@ const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
 apiRouter.post("/user", (req, res) =>
-    routeHandler(data, req, res, createUser, isUserCredentials)
-);
-
-apiRouter.delete("/user/:user", (req, res) =>
-    routeHandler(data, req, res, deleteUser, isAuthToken)
-);
-
-apiRouter.get("/user/:user", (req, res) =>
     routeHandler(
         data,
         req,
         res,
-        (d, _, p) => getProfile(d, p),
-        (o) => typeof o === "object"
+        (d, _c, b, _p) => createUser(d, b),
+        isUserCredentials
     )
 );
 
+apiRouter.delete("/user/:user", (req, res) =>
+    routeHandler(data, req, res, (d, c, _b, p) => deleteUser(d, c, p), isAny)
+);
+
+apiRouter.get("/user/:user", (req, res) =>
+    routeHandler(data, req, res, (d, _c, _b, p) => getProfile(d, p), isAny)
+);
+
 apiRouter.put("/user/:user/friend/:other", (req, res) =>
-    routeHandler(data, req, res, friendRequest, isAuthToken)
+    routeHandler(data, req, res, (d, c, _b, p) => friendRequest(d, c, p), isAny)
 );
 
 apiRouter.delete("/user/:user/friend/:other", (req, res) =>
-    routeHandler(data, req, res, unfriend, isAuthToken)
+    routeHandler(data, req, res, (d, c, _b, p) => unfriend(d, c, p), isAny)
 );
 
 apiRouter.post("/session", (req, res) =>
-    routeHandler(data, req, res, login, isUserCredentials)
+    routeHandler(
+        data,
+        req,
+        res,
+        (d, _c, b, _p) => login(d, b),
+        isUserCredentials
+    )
 );
 
 apiRouter.delete("/session", (req, res) =>
-    routeHandler(data, req, res, logout, isAuthToken)
+    routeHandler(data, req, res, (d, c, _b) => logout(d, c), isAny)
 );
 
 app.use((_req, res) => {
@@ -76,3 +86,7 @@ app.use((_req, res) => {
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
+
+function isAny(o: unknown): o is any {
+    return true;
+}

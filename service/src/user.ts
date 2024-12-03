@@ -21,10 +21,6 @@ export type Session = {
     username: string;
 };
 
-export type AuthToken = {
-    token: string;
-};
-
 export function isUserCredentials(obj: unknown): obj is UserCredentials {
     return (
         typeof obj === "object" &&
@@ -50,14 +46,6 @@ export function isStatistics(obj: unknown): obj is Statistics {
         obj !== null &&
         typeof (obj as Statistics).plays === "number" &&
         typeof (obj as Statistics).wins === "number"
-    );
-}
-
-export function isAuthToken(obj: unknown): obj is AuthToken {
-    return (
-        typeof obj === "object" &&
-        obj !== null &&
-        typeof (obj as AuthToken).token === "string"
     );
 }
 
