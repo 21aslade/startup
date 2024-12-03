@@ -1,30 +1,25 @@
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
 import Play from "./routes/Play.jsx";
 import Profile from "./routes/Profile.jsx";
 import { Session, UserCredentials } from "linebreak-service";
-import { createUser, login, logout } from "./endpoints.js";
-import { RequireAuth, SessionProvider, useSession } from "./session.jsx";
+import { createUser, getSession, login, logout } from "./endpoints.js";
+import { ProfileRedirect, RequireAuth, SessionProvider } from "./session.jsx";
 import NotFound from "./routes/NotFound.jsx";
 
-const sessionStorageKey = "session";
-
 export default function App() {
-    const [session, setSession] = useState<Session | undefined>(() => {
-        const session = localStorage.getItem(sessionStorageKey);
-        if (session === null) {
-            return undefined;
-        }
+    const [session, setSession] = useState<Session | undefined | null>();
 
-        try {
-            return JSON.parse(session);
-        } catch (e) {
-            return undefined;
+    useEffect(() => {
+        if (session === undefined) {
+            getSession()
+                .then(setSession)
+                .catch(() => setSession(null));
         }
-    });
+    }, [session]);
 
     return (
         <BrowserRouter>
@@ -38,30 +33,28 @@ export default function App() {
 }
 
 type AppRoutesProps = {
-    session?: Session;
-    setSession: (s?: Session) => void;
+    session?: Session | null;
+    setSession: (s?: Session | null) => void;
 };
 function AppRoutes({ session, setSession }: AppRoutesProps) {
     const navigate = useNavigate();
 
     const onLogin = async (c: UserCredentials, register: boolean) => {
         const session = await (register ? createUser(c) : login(c));
-        localStorage.setItem(sessionStorageKey, JSON.stringify(session));
         setSession(session);
         navigate("/profile");
     };
 
     const onLogout = useCallback(async () => {
-        if (session !== undefined) {
-            // Consider self logged out even if unknown
+        if (session !== undefined && session !== null) {
+            // Consider self logged out even if unknown error occurs
             await logout().catch(() => {});
         }
-        setSession(undefined);
-        localStorage.removeItem(sessionStorageKey);
+        setSession(null);
     }, [session]);
 
     return (
-        <SessionProvider value={{ session, logout: onLogout }}>
+        <SessionProvider value={session}>
             <Routes>
                 <Route path="*" element={<NotFound />} />
                 <Route
@@ -83,19 +76,4 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
             </Routes>
         </SessionProvider>
     );
-}
-
-function ProfileRedirect() {
-    const navigate = useNavigate();
-    const session = useSession();
-    useLayoutEffect(() => {
-        if (session !== undefined) {
-            const userURL = encodeURIComponent(session.username);
-            navigate(`/profile/${userURL}`);
-        } else {
-            navigate("/");
-        }
-    }, [session]);
-
-    return <></>;
 }

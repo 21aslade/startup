@@ -69,6 +69,11 @@ export async function unfriend(user: string, other: string): Promise<void> {
     }
 }
 
+export async function getSession(): Promise<Session> {
+    const result = await fetch("/api/session");
+    return handleResponse(result, isSession);
+}
+
 export async function login(credentials: UserCredentials): Promise<Session> {
     const result = await fetch("/api/session", {
         method: "POST",

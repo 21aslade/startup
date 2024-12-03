@@ -19,7 +19,11 @@ export interface DataAccess {
     deleteUser(username: string): Promise<void>;
 
     getSession(token: string): Promise<Session | undefined>;
-    createSession(token: string, session: Session): Promise<void>;
+    createSession(
+        token: string,
+        session: Session,
+        expireAt: Date
+    ): Promise<void>;
     deleteSession(token: string): Promise<void>;
 }
 
@@ -54,9 +58,12 @@ export async function initializeDBClient(
         async getSession(token: string) {
             return (await sessions.findOne({ token })).session;
         },
-        async createSession(token: string, session: Session) {
-            const expireAtDate = new Date(session.expireAt);
-            await sessions.insertOne({ token, session, expireAtDate });
+        async createSession(token: string, session: Session, expireAt: Date) {
+            await sessions.insertOne({
+                token,
+                session,
+                expireAtDate: expireAt,
+            });
         },
         async deleteSession(token: string) {
             await sessions.deleteOne({ token });

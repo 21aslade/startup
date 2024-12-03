@@ -87,6 +87,13 @@ export async function logout(
     return { cookie: { key: authCookieKey, value: undefined } };
 }
 
+export async function getSession(
+    data: DataAccess,
+    cookies: Record<string, string>
+): Promise<HandlerResponse<Session>> {
+    return { body: await requireAuth(data, cookies) };
+}
+
 export async function friendRequest(
     data: DataAccess,
     cookies: Record<string, string>,
@@ -129,21 +136,21 @@ async function createSession(
     username: string
 ): Promise<HandlerResponse<Session>> {
     const now = Date.now();
+    const expireAt = new Date(now + tokenDuration);
 
     const token = uuid();
     const session: Session = {
-        expireAt: now + tokenDuration,
         username,
     };
 
-    await data.createSession(token, session);
+    await data.createSession(token, session, expireAt);
 
     return {
         body: session,
         cookie: {
             key: authCookieKey,
             value: token,
-            expires: new Date(session.expireAt),
+            expires: expireAt,
         },
     };
 }
@@ -157,10 +164,6 @@ async function requireAuth(
         throw new RouteException(401, "Unauthorized");
     }
     const session = await data.getSession(token);
-    const now = Date.now();
-    if (session === undefined || session.expireAt < now) {
-        throw new RouteException(401, "Unauthorized");
-    }
 
     return session;
 }

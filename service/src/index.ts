@@ -6,6 +6,7 @@ import {
     deleteUser,
     friendRequest,
     getProfile,
+    getSession,
     login,
     logout,
     unfriend,
@@ -63,6 +64,10 @@ apiRouter.put("/user/:user/friend/:other", (req, res) =>
 
 apiRouter.delete("/user/:user/friend/:other", (req, res) =>
     routeHandler(data, req, res, (d, c, _b, p) => unfriend(d, c, p), isAny)
+);
+
+apiRouter.get("/session", (req, res) =>
+    routeHandler(data, req, res, (d, c, _b, _p) => getSession(d, c), isAny)
 );
 
 apiRouter.post("/session", (req, res) =>

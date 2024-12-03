@@ -7,34 +7,34 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-type SessionContext = {
-    session: Session | undefined;
-    logout(): Promise<void>;
-};
-
-const SessionContext = createContext<SessionContext>({
-    session: undefined,
-    logout: async () => {},
-});
+type SessionContext = Session | null | undefined;
+const SessionContext = createContext<SessionContext>(undefined);
 
 type RequireAuthProps = PropsWithChildren<{
     backupRoute: string | undefined;
 }>;
 
+export function ProfileRedirect() {
+    const navigate = useNavigate();
+    const session = useContext(SessionContext);
+    useLayoutEffect(() => {
+        if (session !== undefined && session !== null) {
+            const userURL = encodeURIComponent(session.username);
+            navigate(`/profile/${userURL}`);
+        } else if (session === null) {
+            navigate("/");
+        }
+    }, [session]);
+
+    return <></>;
+}
+
 export function RequireAuth({ backupRoute, children }: RequireAuthProps) {
-    const { session, logout } = useContext(SessionContext);
+    const session = useContext(SessionContext);
     const navigate = useNavigate();
     useLayoutEffect(() => {
-        const now = Date.now();
-        const expired = session !== undefined && now > session?.expireAt;
-        if (expired) {
-            logout();
-            return;
-        }
-
-        if (session === undefined && backupRoute !== undefined) {
+        if (session === null && backupRoute !== undefined) {
             navigate(backupRoute);
-            return;
         }
     }, [session, backupRoute]);
 
@@ -42,7 +42,7 @@ export function RequireAuth({ backupRoute, children }: RequireAuthProps) {
 }
 
 export function useSession(): Session | undefined {
-    return useContext(SessionContext).session;
+    return useContext(SessionContext) ?? undefined;
 }
 
 export const SessionProvider = SessionContext.Provider;
