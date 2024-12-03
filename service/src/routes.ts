@@ -117,7 +117,7 @@ async function createSession(
     };
 
     const token = uuid();
-    await data.putAuth(token, session);
+    await data.createAuth(token, session);
 
     return { token };
 }
