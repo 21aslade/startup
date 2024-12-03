@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
-import { useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
 import Play from "./routes/Play.jsx";
 import Profile from "./routes/Profile.jsx";
@@ -51,28 +51,22 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
         navigate("/profile");
     };
 
-    const onLogout = async () => {
+    const onLogout = useCallback(async () => {
         if (session !== undefined) {
             // Consider self logged out even if unknown
             await logout(session.token).catch(() => {});
         }
         setSession(undefined);
         localStorage.removeItem(sessionStorageKey);
-    };
+    }, [session]);
 
     return (
-        <SessionProvider value={session}>
+        <SessionProvider value={{ session, logout: onLogout }}>
             <Routes>
                 <Route path="*" element={<NotFound />} />
                 <Route
                     path="/"
-                    element={
-                        <Home
-                            onLogin={onLogin}
-                            onLogout={onLogout}
-                            username={session?.username}
-                        />
-                    }
+                    element={<Home onLogin={onLogin} onLogout={onLogout} />}
                 />
                 <Route path="/profile">
                     <Route index element={<ProfileRedirect />}></Route>

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { PrimaryButton, SecondaryButton } from "../components/Button.jsx";
 import { styled } from "styled-components";
 import { UserCredentials } from "linebreak-service";
 import { ServerError } from "../endpoints.js";
 import ErrorMessage from "../components/ErrorMessage.jsx";
+import { useSession } from "../session.jsx";
 
 const Layout = styled.div`
     height: 100%;
@@ -120,12 +121,19 @@ function Login({ onSubmit }: LoginProps) {
 }
 
 export type HomeProps = {
-    username?: string;
     onLogin: (c: UserCredentials, r: boolean) => Promise<void>;
     onLogout: () => Promise<void>;
 };
 
-export default function Home({ username, onLogin, onLogout }: HomeProps) {
+export default function Home({ onLogin, onLogout }: HomeProps) {
+    const session = useSession();
+    useLayoutEffect(() => {
+        const now = Date.now();
+        if (session !== undefined && now > session.expireAt) {
+            onLogout();
+        }
+    }, [session]);
+
     return (
         <Layout>
             <section>
@@ -150,11 +158,11 @@ export default function Home({ username, onLogin, onLogout }: HomeProps) {
                 </PromotionB>
             </section>
             <section>
-                {username === undefined ? (
+                {session === undefined ? (
                     <Login onSubmit={onLogin} />
                 ) : (
                     <LoginWrapper>
-                        <h3>Welcome back, {username}</h3>
+                        <h3>Welcome back, {session.username}</h3>
                         <SecondaryButton onClick={onLogout}>
                             Logout
                         </SecondaryButton>
