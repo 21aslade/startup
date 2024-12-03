@@ -17,7 +17,8 @@ export type Statistics = {
 };
 
 export type Session = {
-    expiresAt: number;
+    token: string;
+    expireAt: number;
     username: string;
 };
 
@@ -58,6 +59,16 @@ export function isAuthToken(obj: unknown): obj is AuthToken {
         typeof obj === "object" &&
         obj !== null &&
         typeof (obj as AuthToken).token === "string"
+    );
+}
+
+export function isSession(obj: unknown): obj is Session {
+    return (
+        typeof obj === "object" &&
+        obj !== null &&
+        typeof (obj as Session).token === "string" &&
+        typeof (obj as Session).username === "string" &&
+        typeof (obj as Session).expireAt === "number"
     );
 }
 

@@ -5,14 +5,9 @@ import { useLayoutEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
 import Play from "./routes/Play.jsx";
 import Profile from "./routes/Profile.jsx";
-import { UserCredentials } from "linebreak-service";
+import { Session, UserCredentials } from "linebreak-service";
 import { createUser, login, logout } from "./endpoints.js";
-import {
-    RequireAuth,
-    Session,
-    SessionProvider,
-    useSession,
-} from "./session.jsx";
+import { RequireAuth, SessionProvider, useSession } from "./session.jsx";
 import NotFound from "./routes/NotFound.jsx";
 
 const sessionStorageKey = "session";
@@ -50,8 +45,7 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
     const navigate = useNavigate();
 
     const onLogin = async (c: UserCredentials, register: boolean) => {
-        const auth = await (register ? createUser(c) : login(c));
-        const session = { username: c.username, auth };
+        const session = await (register ? createUser(c) : login(c));
         localStorage.setItem(sessionStorageKey, JSON.stringify(session));
         setSession(session);
         navigate("/profile");
@@ -59,10 +53,11 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
 
     const onLogout = async () => {
         if (session !== undefined) {
-            await logout(session.auth).catch(() => {});
-            setSession(undefined);
-            localStorage.removeItem(sessionStorageKey);
+            // Consider self logged out even if unknown
+            await logout(session.token).catch(() => {});
         }
+        setSession(undefined);
+        localStorage.removeItem(sessionStorageKey);
     };
 
     return (

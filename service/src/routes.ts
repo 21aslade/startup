@@ -9,7 +9,7 @@ const tokenDuration = 7 * 24 * 60 * 60 * 1000;
 export async function createUser(
     data: DataAccess,
     body: UserCredentials
-): Promise<AuthToken> {
+): Promise<Session> {
     if ((await data.getUser(body.username)) !== undefined) {
         throw new RouteException(409, "Username already taken");
     }
@@ -56,7 +56,7 @@ export async function getProfile(
 export async function login(
     data: DataAccess,
     body: UserCredentials
-): Promise<AuthToken> {
+): Promise<Session> {
     const user = await data.getUser(body.username);
     if (user === undefined || body.password !== user.password) {
         throw new RouteException(401, "Incorrect username or password");
@@ -70,7 +70,7 @@ export async function logout(
     { token }: AuthToken
 ): Promise<void> {
     await requireAuth(data, token);
-    await data.deleteAuth(token);
+    await data.deleteSession(token);
 }
 
 export async function friendRequest(
@@ -109,23 +109,24 @@ export async function unfriend(
 async function createSession(
     data: DataAccess,
     username: string
-): Promise<AuthToken> {
+): Promise<Session> {
     const now = Date.now();
+
     const session: Session = {
-        expiresAt: now + tokenDuration,
+        token: uuid(),
+        expireAt: now + tokenDuration,
         username,
     };
 
-    const token = uuid();
-    await data.createAuth(token, session);
+    await data.createSession(session);
 
-    return { token };
+    return session;
 }
 
 async function requireAuth(data: DataAccess, token: string): Promise<Session> {
-    const session = await data.getAuth(token);
+    const session = await data.getSession(token);
     const now = Date.now();
-    if (session === undefined || session.expiresAt < now) {
+    if (session === undefined || session.expireAt < now) {
         throw new RouteException(401, "Unauthorized");
     }
 

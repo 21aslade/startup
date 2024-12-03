@@ -1,4 +1,4 @@
-import type { AuthToken } from "linebreak-service";
+import type { Session } from "linebreak-service";
 import {
     createContext,
     PropsWithChildren,
@@ -6,11 +6,6 @@ import {
     useLayoutEffect,
 } from "react";
 import { useNavigate } from "react-router-dom";
-
-export type Session = {
-    auth: AuthToken;
-    username: string;
-};
 
 const SessionContext = createContext<Session | undefined>(undefined);
 
@@ -22,19 +17,15 @@ export function RequireAuth({ backupRoute, children }: RequireAuthProps) {
     const session = useSession();
     const navigate = useNavigate();
     useLayoutEffect(() => {
-        if (session === undefined && backupRoute !== undefined) {
+        const now = Date.now();
+        const redirect = session === undefined || now > session.expireAt;
+        if (redirect && backupRoute !== undefined) {
             navigate(backupRoute);
             return;
         }
     }, [session, backupRoute]);
 
-    return session ? (
-        <SessionContext.Provider value={session}>
-            {children}
-        </SessionContext.Provider>
-    ) : (
-        <></>
-    );
+    return session ? children : <></>;
 }
 
 export function useSession(): Session | undefined {

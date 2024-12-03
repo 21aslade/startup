@@ -7,19 +7,16 @@ export type DBConfig = {
     password: string;
 };
 
-type Auth = {
-    token: string;
-    session: Session;
-};
+type Auth = Session & { expireAtDate: Date };
 
 export interface DataAccess {
     getUser(username: string): Promise<User | undefined>;
     putUser(user: User): Promise<void>;
     deleteUser(username: string): Promise<void>;
 
-    getAuth(authToken: string): Promise<Session | undefined>;
-    createAuth(authToken: string, session: Session): Promise<void>;
-    deleteAuth(authToken: string): Promise<void>;
+    getSession(token: string): Promise<Session | undefined>;
+    createSession(session: Session): Promise<void>;
+    deleteSession(token: string): Promise<void>;
 }
 
 export async function initializeDBClient(
@@ -29,16 +26,12 @@ export async function initializeDBClient(
     const client = new MongoClient(url);
     const db = client.db("linebreak");
     const users = db.collection<User>("users");
-    const auth = db.collection<Auth>("auth");
+    const sessions = db.collection<Auth>("auth");
 
-    await users.createIndex(
-        { username: 1 },
-        {
-            unique: true,
-        }
-    );
+    await users.createIndex({ username: 1 }, { unique: true });
 
-    await auth.createIndex({ token: 1 }, { unique: true });
+    await sessions.createIndex({ token: 1 }, { unique: true });
+    await sessions.createIndex({ expireAtDate: 1 }, { expireAfterSeconds: 0 });
 
     return {
         async getUser(username: string) {
@@ -50,18 +43,19 @@ export async function initializeDBClient(
             });
         },
         async deleteUser(username: string) {
-            await auth.deleteMany({ session: { username } });
+            await sessions.deleteMany({ session: { username } });
             await users.deleteOne({ username });
         },
 
-        async getAuth(token: string) {
-            return (await auth.findOne({ token }))?.session;
+        async getSession(token: string) {
+            return (await sessions.findOne({ token })) ?? undefined;
         },
-        async createAuth(token: string, session: Session) {
-            await auth.insertOne({ token, session });
+        async createSession(session: Session) {
+            const expireAtDate = new Date(session.expireAt);
+            await sessions.insertOne({ ...session, expireAtDate });
         },
-        async deleteAuth(token: string) {
-            await auth.deleteOne({ token });
+        async deleteSession(token: string) {
+            await sessions.deleteOne({ token });
         },
     };
 }

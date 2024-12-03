@@ -1,21 +1,22 @@
 import {
     AuthToken,
-    isAuthToken,
     isProfile,
+    isSession,
     Profile,
+    Session,
     UserCredentials,
 } from "linebreak-service";
 
 export async function createUser(
     credentials: UserCredentials
-): Promise<AuthToken> {
+): Promise<Session> {
     const result = await fetch("/api/user", {
         method: "POST",
         body: JSON.stringify(credentials),
         headers: { "content-type": "application/json" },
     });
 
-    return handleResponse(result, isAuthToken);
+    return handleResponse(result, isSession);
 }
 
 export async function deleteUser(
@@ -80,20 +81,20 @@ export async function unfriend(
     }
 }
 
-export async function login(credentials: UserCredentials): Promise<AuthToken> {
+export async function login(credentials: UserCredentials): Promise<Session> {
     const result = await fetch("/api/session", {
         method: "POST",
         body: JSON.stringify(credentials),
         headers: { "content-type": "application/json" },
     });
 
-    return handleResponse(result, isAuthToken);
+    return handleResponse(result, isSession);
 }
 
-export async function logout(token: AuthToken): Promise<void> {
+export async function logout(token: string): Promise<void> {
     const result = await fetch("/api/session", {
         method: "DELETE",
-        body: JSON.stringify(token),
+        body: JSON.stringify({ token }),
         headers: { "content-type": "application/json" },
     });
 
