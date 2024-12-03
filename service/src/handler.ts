@@ -1,17 +1,27 @@
-import {
-    Request,
-    Response as ExpressResponse,
-    RequestHandler,
-    NextFunction,
-} from "express";
+import { Request, Response as ExpressResponse } from "express";
 import { DataAccess } from "./database.js";
 
 type ErrorResponse = {
     error: string;
 };
 
+export type Cookie = {
+    key: string;
+    value: string | undefined;
+    expires?: Date;
+};
+
+export type HandlerResponse<U> = {
+    body?: U;
+    cookie?: Cookie;
+};
+
 type Guard<T> = (o: unknown) => o is T;
-type Handler<P, T, U> = (data: DataAccess, body: T, params: P) => U;
+type Handler<P, T, U> = (
+    data: DataAccess,
+    body: T,
+    params: P
+) => Promise<HandlerResponse<U>>;
 
 export async function routeHandler<P, T, U, Q, L>(
     data: DataAccess,
@@ -27,7 +37,16 @@ export async function routeHandler<P, T, U, Q, L>(
             return;
         }
 
-        const response = await handler(data, req.body, req.params);
+        const { body: response, cookie } = await handler(
+            data,
+            req.body,
+            req.params
+        );
+
+        if (cookie !== undefined) {
+            setCookie(res, cookie);
+        }
+
         if (response !== undefined) {
             res.status(200).end(JSON.stringify(response));
         } else {
@@ -39,6 +58,19 @@ export async function routeHandler<P, T, U, Q, L>(
         } else {
             throw e;
         }
+    }
+}
+
+function setCookie(res: ExpressResponse<unknown, unknown>, cookie: Cookie) {
+    if (cookie.value !== undefined) {
+        res.cookie(cookie.key, cookie.value, {
+            secure: true,
+            httpOnly: true,
+            sameSite: "strict",
+            ...(cookie.expires ? { expires: cookie.expires } : {}),
+        });
+    } else {
+        res.clearCookie(cookie.key);
     }
 }
 

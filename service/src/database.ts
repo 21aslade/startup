@@ -7,7 +7,11 @@ export type DBConfig = {
     password: string;
 };
 
-type Auth = Session & { expireAtDate: Date };
+type Auth = {
+    token: string;
+    session: Session;
+    expireAtDate: Date;
+};
 
 export interface DataAccess {
     getUser(username: string): Promise<User | undefined>;
@@ -15,7 +19,7 @@ export interface DataAccess {
     deleteUser(username: string): Promise<void>;
 
     getSession(token: string): Promise<Session | undefined>;
-    createSession(session: Session): Promise<void>;
+    createSession(token: string, session: Session): Promise<void>;
     deleteSession(token: string): Promise<void>;
 }
 
@@ -48,11 +52,11 @@ export async function initializeDBClient(
         },
 
         async getSession(token: string) {
-            return (await sessions.findOne({ token })) ?? undefined;
+            return (await sessions.findOne({ token })).session;
         },
-        async createSession(session: Session) {
+        async createSession(token: string, session: Session) {
             const expireAtDate = new Date(session.expireAt);
-            await sessions.insertOne({ ...session, expireAtDate });
+            await sessions.insertOne({ token, session, expireAtDate });
         },
         async deleteSession(token: string) {
             await sessions.deleteOne({ token });

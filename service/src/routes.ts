@@ -1,16 +1,17 @@
 import { DataAccess } from "./database.js";
-import { RouteException } from "./handler.js";
+import { HandlerResponse, RouteException } from "./handler.js";
 import { AuthToken, Profile, Session, User, UserCredentials } from "./user.js";
 import { v4 as uuid } from "uuid";
 import * as bcrypt from "bcrypt";
 
 // auth tokens last for one week
 const tokenDuration = 7 * 24 * 60 * 60 * 1000;
+const authCookieKey = "authToken";
 
 export async function createUser(
     data: DataAccess,
     body: UserCredentials
-): Promise<Session> {
+): Promise<HandlerResponse<Session>> {
     if ((await data.getUser(body.username)) !== undefined) {
         throw new RouteException(409, "Username already taken");
     }
@@ -32,7 +33,7 @@ export async function deleteUser(
     data: DataAccess,
     { token }: AuthToken,
     params: { user: string }
-): Promise<void> {
+): Promise<HandlerResponse<void>> {
     const { username } = await requireUserAuth(data, params.user, token);
 
     if ((await data.getUser(username)) === undefined) {
@@ -40,12 +41,14 @@ export async function deleteUser(
     }
 
     await data.deleteUser(username);
+
+    return { cookie: { key: authCookieKey, value: undefined } };
 }
 
 export async function getProfile(
     data: DataAccess,
     params: { user: string }
-): Promise<Profile> {
+): Promise<HandlerResponse<Profile>> {
     const username = params.user;
     const user = await data.getUser(username);
     if (user === undefined) {
@@ -53,13 +56,13 @@ export async function getProfile(
     }
     const { passwordHash: _, ...profile } = user;
 
-    return profile;
+    return { body: profile };
 }
 
 export async function login(
     data: DataAccess,
     body: UserCredentials
-): Promise<Session> {
+): Promise<HandlerResponse<Session>> {
     const user = await data.getUser(body.username);
     if (
         user === undefined ||
@@ -74,16 +77,17 @@ export async function login(
 export async function logout(
     data: DataAccess,
     { token }: AuthToken
-): Promise<void> {
+): Promise<HandlerResponse<void>> {
     await requireAuth(data, token);
     await data.deleteSession(token);
+    return {};
 }
 
 export async function friendRequest(
     data: DataAccess,
     { token }: AuthToken,
     params: { user: string; other: string }
-): Promise<void> {
+): Promise<HandlerResponse<void>> {
     await requireUserAuth(data, params.user, token);
 
     const user = await data.getUser(params.user);
@@ -93,13 +97,15 @@ export async function friendRequest(
     }
 
     await data.putUser(user);
+
+    return {};
 }
 
 export async function unfriend(
     data: DataAccess,
     { token }: AuthToken,
     params: { user: string; other: string }
-): Promise<void> {
+): Promise<HandlerResponse<void>> {
     await requireUserAuth(data, params.user, token);
 
     const user = await data.getUser(params.user);
@@ -110,23 +116,32 @@ export async function unfriend(
     }
 
     await data.putUser(user);
+
+    return {};
 }
 
 async function createSession(
     data: DataAccess,
     username: string
-): Promise<Session> {
+): Promise<HandlerResponse<Session>> {
     const now = Date.now();
 
+    const token = uuid();
     const session: Session = {
-        token: uuid(),
         expireAt: now + tokenDuration,
         username,
     };
 
-    await data.createSession(session);
+    await data.createSession(token, session);
 
-    return session;
+    return {
+        body: session,
+        cookie: {
+            key: authCookieKey,
+            value: token,
+            expires: new Date(session.expireAt),
+        },
+    };
 }
 
 async function requireAuth(data: DataAccess, token: string): Promise<Session> {
