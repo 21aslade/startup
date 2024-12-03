@@ -1,5 +1,4 @@
 import {
-    AuthToken,
     isProfile,
     isSession,
     Profile,
@@ -19,14 +18,10 @@ export async function createUser(
     return handleResponse(result, isSession);
 }
 
-export async function deleteUser(
-    token: AuthToken,
-    user: string
-): Promise<void> {
+export async function deleteUser(user: string): Promise<void> {
     const uriUser = encodeURIComponent(user);
     const result = await fetch(`/api/user/${uriUser}`, {
         method: "DELETE",
-        body: JSON.stringify(token),
         headers: { "content-type": "application/json" },
     });
 
@@ -44,7 +39,6 @@ export async function getProfile(user: string): Promise<Profile> {
 }
 
 export async function friendRequest(
-    auth: AuthToken,
     user: string,
     other: string
 ): Promise<void> {
@@ -52,7 +46,6 @@ export async function friendRequest(
     const uriOther = encodeURIComponent(other);
     const result = await fetch(`/api/user/${uriUser}/friend/${uriOther}`, {
         method: "PUT",
-        body: JSON.stringify(auth),
         headers: { "content-type": "application/json" },
     });
 
@@ -62,16 +55,11 @@ export async function friendRequest(
     }
 }
 
-export async function unfriend(
-    auth: AuthToken,
-    user: string,
-    other: string
-): Promise<void> {
+export async function unfriend(user: string, other: string): Promise<void> {
     const uriUser = encodeURIComponent(user);
     const uriOther = encodeURIComponent(other);
     const result = await fetch(`/api/user/${uriUser}/friend/${uriOther}`, {
         method: "DELETE",
-        body: JSON.stringify(auth),
         headers: { "content-type": "application/json" },
     });
 
@@ -91,10 +79,9 @@ export async function login(credentials: UserCredentials): Promise<Session> {
     return handleResponse(result, isSession);
 }
 
-export async function logout(token: string): Promise<void> {
+export async function logout(): Promise<void> {
     const result = await fetch("/api/session", {
         method: "DELETE",
-        body: JSON.stringify({ token }),
         headers: { "content-type": "application/json" },
     });
 

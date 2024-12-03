@@ -54,7 +54,7 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
     const onLogout = useCallback(async () => {
         if (session !== undefined) {
             // Consider self logged out even if unknown
-            await logout(session.token).catch(() => {});
+            await logout().catch(() => {});
         }
         setSession(undefined);
         localStorage.removeItem(sessionStorageKey);
@@ -91,7 +91,6 @@ function ProfileRedirect() {
     useLayoutEffect(() => {
         if (session !== undefined) {
             const userURL = encodeURIComponent(session.username);
-            console.log(userURL);
             navigate(`/profile/${userURL}`);
         } else {
             navigate("/");

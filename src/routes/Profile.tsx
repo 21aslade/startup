@@ -128,7 +128,7 @@ export default function Profile() {
         if (session === undefined || username == undefined) {
             return;
         }
-        await friendRequest(session.auth, session.username, username);
+        await friendRequest(session.username, username);
 
         setMyProfile(await getProfile(session.username));
     };
