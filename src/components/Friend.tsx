@@ -5,7 +5,7 @@ const FriendWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: 12px 0px;
 
     & + .friend {
         border-top: 1px solid var(--border);

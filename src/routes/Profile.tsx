@@ -1,10 +1,12 @@
-import { getProfile, ServerError } from "../endpoints.js";
+import { friendRequest, getProfile, ServerError } from "../endpoints.js";
 import Friend from "../components/Friend.jsx";
 import type { Profile, Statistics } from "linebreak-service";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import NotFound from "./NotFound.jsx";
+import { useSession } from "../session.jsx";
+import { PrimaryButton } from "../components/Button.jsx";
 
 const Wrapper = styled.div`
     padding: 0 24px;
@@ -41,6 +43,7 @@ const FriendList = styled.div`
     max-width: 300px;
     display: flex;
     flex-direction: column;
+    align-items: end;
 `;
 
 const FriendCode = styled.div`
@@ -49,6 +52,7 @@ const FriendCode = styled.div`
     justify-content: center;
     border: 1px solid var(--border);
     padding: 0 24px 24px 24px;
+    margin-bottom: 16px;
     width: fit-content;
 `;
 
@@ -94,7 +98,9 @@ function Permalink({ username }: { username: string }) {
 
 export default function Profile() {
     const navigate = useNavigate();
+    const session = useSession();
     const username = useParams()["username"];
+    const [myProfile, setMyProfile] = useState<Profile | undefined>(undefined);
     const [profile, setProfile] = useState<Profile | null | undefined>(
         undefined
     );
@@ -110,10 +116,22 @@ export default function Profile() {
                 if (e instanceof ServerError && e.status === 404) {
                     setProfile(null);
                 } else {
-                    navigate("/");
+                    throw e;
                 }
             });
-    }, [username]);
+        if (session !== undefined) {
+            getProfile(session.username).then(setMyProfile);
+        }
+    }, [username, session]);
+
+    const follow = async () => {
+        if (session === undefined || username == undefined) {
+            return;
+        }
+        await friendRequest(session.auth, session.username, username);
+
+        setMyProfile(await getProfile(session.username));
+    };
 
     if (profile === null) {
         return <NotFound />;
@@ -121,6 +139,12 @@ export default function Profile() {
 
     const friends = profile?.friends ?? [];
     const statistics = profile?.statistics;
+
+    const canFollow =
+        username !== undefined &&
+        myProfile !== undefined &&
+        myProfile.username !== username &&
+        !myProfile.friends.includes(username);
 
     return (
         <Wrapper>
@@ -131,9 +155,12 @@ export default function Profile() {
                 )}
                 <FriendsWrapper>
                     {username && <Permalink username={username} />}
+                    {canFollow && (
+                        <PrimaryButton onClick={follow}>Follow</PrimaryButton>
+                    )}
                     {friends.length > 0 && (
                         <FriendList>
-                            <h3>Friends</h3>
+                            <h3>Following</h3>
                             {friends.map((username) => (
                                 <Friend key={username} username={username} />
                             ))}
