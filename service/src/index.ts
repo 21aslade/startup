@@ -51,23 +51,23 @@ apiRouter.post("/user", (req, res) =>
 );
 
 apiRouter.delete("/user/:user", (req, res) =>
-    routeHandler(data, req, res, (d, c, _b, p) => deleteUser(d, c, p), isAny)
+    routeHandler(data, req, res, (d, c, _b, p) => deleteUser(d, c, p), isUnk)
 );
 
 apiRouter.get("/user/:user", (req, res) =>
-    routeHandler(data, req, res, (d, _c, _b, p) => getProfile(d, p), isAny)
+    routeHandler(data, req, res, (d, _c, _b, p) => getProfile(d, p), isUnk)
 );
 
 apiRouter.put("/user/:user/friend/:other", (req, res) =>
-    routeHandler(data, req, res, (d, c, _b, p) => friendRequest(d, c, p), isAny)
+    routeHandler(data, req, res, (d, c, _b, p) => friendRequest(d, c, p), isUnk)
 );
 
 apiRouter.delete("/user/:user/friend/:other", (req, res) =>
-    routeHandler(data, req, res, (d, c, _b, p) => unfriend(d, c, p), isAny)
+    routeHandler(data, req, res, (d, c, _b, p) => unfriend(d, c, p), isUnk)
 );
 
 apiRouter.get("/session", (req, res) =>
-    routeHandler(data, req, res, (d, c, _b, _p) => getSession(d, c), isAny)
+    routeHandler(data, req, res, (d, c, _b, _p) => getSession(d, c), isUnk)
 );
 
 apiRouter.post("/session", (req, res) =>
@@ -81,7 +81,7 @@ apiRouter.post("/session", (req, res) =>
 );
 
 apiRouter.delete("/session", (req, res) =>
-    routeHandler(data, req, res, (d, c, _b) => logout(d, c), isAny)
+    routeHandler(data, req, res, (d, c, _b) => logout(d, c), isUnk)
 );
 
 app.use((_req, res) => {
@@ -92,6 +92,6 @@ app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
 
-function isAny(o: unknown): o is any {
+function isUnk(o: unknown): o is unknown {
     return true;
 }
