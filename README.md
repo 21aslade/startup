@@ -82,6 +82,16 @@ Rubric-wise, that looks like this:
 
 I worked really, really hard on this deliverable (including the dependencies that only exist for it, there are _121_ commits involved). I know I didn't mock the websockets, but it's unclear how I should. I also didn't realize from reading the rubric that mocking WebSocket would be required. Hopefully it's clear that I'm fully capable of mocking the WebSocket behavior. I'd appreciate it if I can still get full credit.
 
+## Startup Service
+
+For this deliverable I added backend endpoints for creating profiles and following other users.
+
+-   [x] **Node.js/Express HTTP service** - done!
+-   [x] **Static middleware for frontend** - done!
+-   [x] **Calls to third-party endpoints** - the QR code on the profile page permalinks to the profile
+-   [x] **Backend service endpoints** - login, following. I didn't realize that we didn't need any login stuff until the next deliverable. All other functionality is tied to websockets
+-   [x] **Frontend calls service endpoints** - done!
+
 ## Dependencies
 
 I use a number of dependencies in this project; I wrote some of them, but others are external:
