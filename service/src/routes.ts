@@ -172,7 +172,7 @@ async function requireUserAuth(
 ): Promise<Session> {
     const session = await requireAuth(data, cookies);
     if (user !== session.username) {
-        throw new RouteException(401, "Unauthorized");
+        throw new RouteException(403, "Forbidden");
     }
 
     return session;
