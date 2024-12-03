@@ -3,7 +3,7 @@ export type UserCredentials = {
     password: string;
 };
 
-export type User = Profile & { password: string };
+export type User = Profile & { passwordHash: string };
 
 export type Profile = {
     username: string;
@@ -40,7 +40,7 @@ export function isUser(obj: unknown): obj is User {
         typeof obj === "object" &&
         obj !== null &&
         typeof (obj as User).username === "string" &&
-        typeof (obj as User).password === "string" &&
+        typeof (obj as User).passwordHash === "string" &&
         isStatistics((obj as User).statistics)
     );
 }

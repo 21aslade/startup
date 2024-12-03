@@ -2,6 +2,7 @@ import { DataAccess } from "./database.js";
 import { RouteException } from "./handler.js";
 import { AuthToken, Profile, Session, User, UserCredentials } from "./user.js";
 import { v4 as uuid } from "uuid";
+import * as bcrypt from "bcrypt";
 
 // auth tokens last for one week
 const tokenDuration = 7 * 24 * 60 * 60 * 1000;
@@ -14,9 +15,11 @@ export async function createUser(
         throw new RouteException(409, "Username already taken");
     }
 
+    const passwordHash = await bcrypt.hash(body.password, 10);
+
     const user: User = {
         username: body.username,
-        password: body.password,
+        passwordHash,
         statistics: { wins: 0, plays: 0 },
         friends: [],
     };
@@ -48,7 +51,7 @@ export async function getProfile(
     if (user === undefined) {
         throw new RouteException(404, "User not found");
     }
-    const { password: _, ...profile } = user;
+    const { passwordHash: _, ...profile } = user;
 
     return profile;
 }
@@ -58,7 +61,10 @@ export async function login(
     body: UserCredentials
 ): Promise<Session> {
     const user = await data.getUser(body.username);
-    if (user === undefined || body.password !== user.password) {
+    if (
+        user === undefined ||
+        !(await bcrypt.compare(body.password, user.passwordHash))
+    ) {
         throw new RouteException(401, "Incorrect username or password");
     }
 
