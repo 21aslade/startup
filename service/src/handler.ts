@@ -4,15 +4,17 @@ import {
     RequestHandler,
     NextFunction,
 } from "express";
+import { DataAccess } from "./database.js";
 
 type ErrorResponse = {
     error: string;
 };
 
 type Guard<T> = (o: unknown) => o is T;
-type Handler<P, T, U> = (body: T, params: P) => U;
+type Handler<P, T, U> = (data: DataAccess, body: T, params: P) => U;
 
 export async function routeHandler<P, T, U, Q, L>(
+    data: DataAccess,
     req: Request<P, U, any, Q, L>,
     res: ExpressResponse<U | ErrorResponse, L>,
     handler: Handler<P, T, U>,
@@ -25,7 +27,7 @@ export async function routeHandler<P, T, U, Q, L>(
             return;
         }
 
-        const response = await handler(req.body, req.params);
+        const response = await handler(data, req.body, req.params);
         if (response !== undefined) {
             res.status(200).end(JSON.stringify(response));
         } else {

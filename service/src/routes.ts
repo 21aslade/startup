@@ -1,15 +1,16 @@
+import { DataAccess } from "./database.js";
 import { RouteException } from "./handler.js";
 import { AuthToken, Profile, Session, User, UserCredentials } from "./user.js";
 import { v4 as uuid } from "uuid";
 
-const users: Map<string, User> = new Map();
-let auth: Map<string, Session> = new Map();
-
 // auth tokens last for one week
 const tokenDuration = 7 * 24 * 60 * 60 * 1000;
 
-export function createUser(body: UserCredentials): AuthToken {
-    if (users.get(body.username) !== undefined) {
+export async function createUser(
+    data: DataAccess,
+    body: UserCredentials
+): Promise<AuthToken> {
+    if ((await data.getUser(body.username)) !== undefined) {
         throw new RouteException(409, "Username already taken");
     }
 
@@ -19,80 +20,96 @@ export function createUser(body: UserCredentials): AuthToken {
         statistics: { wins: 0, plays: 0 },
         friends: [],
     };
-    users.set(body.username, user);
+    await data.putUser(user);
 
-    return createSession(body.username);
+    return createSession(data, body.username);
 }
 
-export function deleteUser(
+export async function deleteUser(
+    data: DataAccess,
     { token }: AuthToken,
     params: { user: string }
-): void {
-    const { username } = requireUserAuth(params.user, token);
+): Promise<void> {
+    const { username } = await requireUserAuth(data, params.user, token);
 
-    if (!users.has(username)) {
+    if ((await data.getUser(username)) === undefined) {
         throw new RouteException(404, "User does not exist");
     }
 
-    users.delete(username);
-    auth = new Map(
-        auth.entries().filter(([_, session]) => session.username !== username)
-    );
+    await data.deleteUser(username);
 }
 
-export function getProfile(params: { user: string }): Profile {
+export async function getProfile(
+    data: DataAccess,
+    params: { user: string }
+): Promise<Profile> {
     const username = params.user;
-    const user = users.get(username);
+    const user = await data.getUser(username);
     if (user === undefined) {
         throw new RouteException(404, "User not found");
     }
-    const { password: _, ...profile } = users.get(username);
+    const { password: _, ...profile } = user;
 
     return profile;
 }
 
-export function login(body: UserCredentials): AuthToken {
-    const user = users.get(body.username);
+export async function login(
+    data: DataAccess,
+    body: UserCredentials
+): Promise<AuthToken> {
+    const user = await data.getUser(body.username);
     if (user === undefined || body.password !== user.password) {
         throw new RouteException(401, "Incorrect username or password");
     }
 
-    return createSession(body.username);
+    return createSession(data, body.username);
 }
 
-export function logout({ token }: AuthToken): void {
-    requireAuth(token);
-    auth.delete(token);
+export async function logout(
+    data: DataAccess,
+    { token }: AuthToken
+): Promise<void> {
+    await requireAuth(data, token);
+    await data.deleteAuth(token);
 }
 
-export function friendRequest(
+export async function friendRequest(
+    data: DataAccess,
     { token }: AuthToken,
     params: { user: string; other: string }
-): void {
-    requireUserAuth(params.user, token);
+): Promise<void> {
+    await requireUserAuth(data, params.user, token);
 
-    const user = users.get(params.user);
+    const user = await data.getUser(params.user);
 
     if (!user.friends.includes(params.other)) {
         user.friends.push(params.other);
     }
+
+    await data.putUser(user);
 }
 
-export function unfriend(
+export async function unfriend(
+    data: DataAccess,
     { token }: AuthToken,
     params: { user: string; other: string }
-): void {
-    requireUserAuth(params.user, token);
+): Promise<void> {
+    await requireUserAuth(data, params.user, token);
 
-    const user = users.get(params.user);
+    const user = await data.getUser(params.user);
 
     const userIndex = user.friends.indexOf(params.other);
     if (userIndex >= 0) {
         user.friends.splice(userIndex, 1);
     }
+
+    await data.putUser(user);
 }
 
-function createSession(username: string): AuthToken {
+async function createSession(
+    data: DataAccess,
+    username: string
+): Promise<AuthToken> {
     const now = Date.now();
     const session: Session = {
         expiresAt: now + tokenDuration,
@@ -100,13 +117,13 @@ function createSession(username: string): AuthToken {
     };
 
     const token = uuid();
-    auth.set(token, session);
+    await data.putAuth(token, session);
 
     return { token };
 }
 
-function requireAuth(token: string): Session {
-    const session = auth.get(token);
+async function requireAuth(data: DataAccess, token: string): Promise<Session> {
+    const session = await data.getAuth(token);
     const now = Date.now();
     if (session === undefined || session.expiresAt < now) {
         throw new RouteException(401, "Unauthorized");
@@ -115,8 +132,12 @@ function requireAuth(token: string): Session {
     return session;
 }
 
-function requireUserAuth(user: string, token: string): Session {
-    const session = requireAuth(token);
+async function requireUserAuth(
+    data: DataAccess,
+    user: string,
+    token: string
+): Promise<Session> {
+    const session = await requireAuth(data, token);
     if (user !== session.username) {
         throw new RouteException(401, "Unauthorized");
     }
