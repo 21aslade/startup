@@ -22,21 +22,23 @@ export interface DataAccess {
     deleteAuth(authToken: string): Promise<void>;
 }
 
-export function initializeDBClient(config: DBConfig): DataAccess {
+export async function initializeDBClient(
+    config: DBConfig
+): Promise<DataAccess> {
     const url = `mongodb+srv://${config.username}:${config.password}@${config.hostname}`;
     const client = new MongoClient(url);
     const db = client.db("linebreak");
     const users = db.collection<User>("users");
     const auth = db.collection<Auth>("auth");
 
-    users.createIndex(
+    await users.createIndex(
         { username: 1 },
         {
             unique: true,
         }
     );
 
-    auth.createIndex({ token: 1 }, { unique: true });
+    await auth.createIndex({ token: 1 }, { unique: true });
 
     return {
         async getUser(username: string) {
