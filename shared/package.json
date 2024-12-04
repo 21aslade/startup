@@ -1,0 +1,24 @@
+{
+    "name": "linebreak-shared",
+    "version": "0.0.0",
+    "type": "module",
+    "description": "Shared frontend/backend code for linebreak",
+    "exports": {
+        ".": "./dist/index.js",
+        "./*": "./dist/*.js"
+    },
+    "scripts": {
+        "dev": "tsc && node dist/index.js"
+    },
+    "author": "21aslade",
+    "license": "MIT",
+    "dependencies": {
+        "@types/lodash.isequal": "^4.5.8",
+        "chasm": "21aslade/chasm",
+        "lodash.isequal": "^4.5.0",
+        "wombo": "21aslade/wombo"
+    },
+    "devDependencies": {
+        "typescript": "^5.6.3"
+    }
+}
