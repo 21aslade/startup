@@ -6,6 +6,7 @@
         "module": "NodeNext",
         "moduleResolution": "nodenext",
         "outDir": "dist",
-        "declaration": true
+        "declaration": true,
+        "strict": true
     }
 }

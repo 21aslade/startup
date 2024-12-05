@@ -56,7 +56,7 @@ export async function initializeDBClient(
         },
 
         async getSession(token: string) {
-            return (await sessions.findOne({ token })).session;
+            return (await sessions.findOne({ token }))?.session;
         },
         async createSession(token: string, session: Session, expireAt: Date) {
             await sessions.insertOne({
