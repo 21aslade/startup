@@ -68,7 +68,7 @@ function newLabels(
     original: Map<string, number>,
     modified: Map<string, number>
 ): Iter<[string, number]> {
-    return filter(modified.entries(), ([l, p]) => original.get(l) === p);
+    return filter(modified.entries(), ([l, p]) => original.get(l) !== p);
 }
 
 function diffInstructions(
@@ -89,7 +89,7 @@ function diffInstructions(
 
         if (modNext.done) {
             const instruction = origNext.value!!;
-            const pc = pcMap.length + 1;
+            const pc = pcMap.length > 0 ? pcMap[pcMap.length - 1] + 1 : 0;
             return Result.err([pc, instruction]);
         }
 
