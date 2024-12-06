@@ -4,12 +4,12 @@ import isEqual from "lodash.isequal";
 import { Instruction } from "chasm/instructions";
 import { enumerate, filter, Iter, iterable } from "./util.js";
 
-type Diff = {
+export type Diff = {
     pcMap: number[];
     labels: Map<string, number>;
 };
 
-type DiffError =
+export type DiffError =
     | { type: "deletion"; pc: number; instruction: Instruction }
     | { type: "label"; label: string };
 

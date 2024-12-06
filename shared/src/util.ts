@@ -21,3 +21,13 @@ export function* filter<T>(i: Iter<T>, f: (t: T) => boolean): Iter<T> {
         }
     }
 }
+
+export function* gaps(i: Iter<number>): Iter<number> {
+    let prev = 0;
+    for (let pc = i.next(); !pc.done; pc = i.next()) {
+        while (prev < pc.value) {
+            yield prev;
+            prev++;
+        }
+    }
+}
