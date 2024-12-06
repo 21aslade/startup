@@ -31,7 +31,7 @@ export async function initializeDBClient(
     config: DBConfig
 ): Promise<DataAccess> {
     const url = `mongodb+srv://${config.username}:${config.password}@${config.hostname}`;
-    const client = new MongoClient(url);
+    const client = new MongoClient(url, { autoSelectFamily: false });
     const db = client.db("linebreak");
     const users = db.collection<User>("users");
     const sessions = db.collection<Auth>("auth");
