@@ -24,10 +24,10 @@ type Handler<P, T, U> = (
     params: P
 ) => Promise<HandlerResponse<U>>;
 
-export async function routeHandler<P, T, U, Q, L>(
+export async function routeHandler<P, T, U, Q>(
     data: DataAccess,
-    req: Request<P, U, any, Q, L>,
-    res: ExpressResponse<U | ErrorResponse, L>,
+    req: Request<P, U, any, Q, Record<string, any>>,
+    res: ExpressResponse<U | ErrorResponse, Record<string, any>>,
     handler: Handler<P, T, U>,
     isBody: Guard<T>
 ): Promise<void> {
@@ -63,7 +63,10 @@ export async function routeHandler<P, T, U, Q, L>(
     }
 }
 
-function setCookie(res: ExpressResponse<unknown, unknown>, cookie: Cookie) {
+function setCookie<T>(
+    res: ExpressResponse<T, Record<string, any>>,
+    cookie: Cookie
+) {
     if (cookie.value !== undefined) {
         res.cookie(cookie.key, cookie.value, {
             secure: true,

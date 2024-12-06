@@ -102,6 +102,9 @@ export async function friendRequest(
     await requireUserAuth(data, params.user, cookies);
 
     const user = await data.getUser(params.user);
+    if (user === undefined) {
+        throw new RouteException(404, "User not found");
+    }
 
     if (!user.friends.includes(params.other)) {
         user.friends.push(params.other);
@@ -120,6 +123,14 @@ export async function unfriend(
     await requireUserAuth(data, params.user, cookies);
 
     const user = await data.getUser(params.user);
+    if (user === undefined) {
+        throw new RouteException(404, "User not found");
+    }
+
+    const other = await data.getUser(params.other);
+    if (other === undefined) {
+        throw new RouteException(404, "User not found");
+    }
 
     const userIndex = user.friends.indexOf(params.other);
     if (userIndex >= 0) {
@@ -164,6 +175,10 @@ async function requireAuth(
         throw new RouteException(401, "Unauthorized");
     }
     const session = await data.getSession(token);
+
+    if (session === undefined) {
+        throw new RouteException(401, "Unauthorized");
+    }
 
     return session;
 }
