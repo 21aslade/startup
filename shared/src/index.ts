@@ -1,7 +1,7 @@
 import { Program } from "chasm/parser";
 import { Result } from "wombo/result";
 import { diff, DiffError } from "./diff.js";
-import { filter, gaps, iterable } from "./util.js";
+import { filter, gaps } from "./util.js";
 
 export type UserDiffError =
     | DiffError
@@ -19,9 +19,7 @@ export function validateDiff(
 
     const result = difference.value;
     if (other.instructions.length - orig.instructions.length > 1) {
-        const [_, ...insertions] = iterable(
-            gaps(result.pcMap[Symbol.iterator]())
-        );
+        const [_, ...insertions] = gaps(result.pcMap[Symbol.iterator]());
         return Result.err({ type: "multiple", insertions });
     }
 
@@ -40,13 +38,13 @@ function labelsUsed(p: Program): Result<void, string[]> {
             .map((i) => i.label)
     );
 
-    const unusedLabels = Array.from(
-        iterable(filter(p.labels.keys(), (k) => !usedLabels.has(k)))
-    );
+    const unusedLabels = [
+        ...filter(p.labels.keys(), (k) => !usedLabels.has(k)),
+    ];
 
     if (unusedLabels.length === 0) {
         return Result.ok(undefined);
     } else {
-        return Result.err(unusedLabels);
+        return Result.err([...unusedLabels]);
     }
 }
