@@ -1,9 +1,47 @@
 export type Iter<T> = Iterator<T, undefined, undefined>;
 
+export function* zip<A, B>(a: Iter<A>, b: Iter<B>): Iter<[A, B]> {
+    let aNext = a.next();
+    let bNext = b.next();
+    while (!aNext.done && !bNext.done) {
+        yield [aNext.value, bNext.value];
+        aNext = a.next();
+        bNext = b.next();
+    }
+}
+
 export function iterable<T>(i: Iter<T>): Iterable<T, undefined, undefined> {
     return {
         [Symbol.iterator]: () => i,
     };
+}
+
+export function iterate<T>(i: T[]): Iter<T> {
+    return i[Symbol.iterator]();
+}
+
+export function* range(a: number, b: number): Iter<number> {
+    for (let i = a; i < b; i++) {
+        yield i;
+    }
+}
+
+export function* map<T, U>(i: Iter<T>, f: (t: T) => U): Iter<U> {
+    for (let next = i.next(); !next.done; next = i.next()) {
+        yield f(next.value);
+    }
+}
+
+export function* scan<A, T, U>(
+    i: Iter<T>,
+    f: (a: A, t: T) => [A, U],
+    a: A
+): Iter<U> {
+    for (let next = i.next(); !next.done; next = i.next()) {
+        const result = f(a, next.value);
+        a = result[0];
+        yield result[1];
+    }
 }
 
 export function* enumerate<T>(i: Iter<T>): Iter<[number, T]> {

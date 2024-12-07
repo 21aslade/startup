@@ -7,6 +7,7 @@ import { enumerate, filter, Iter, iterable } from "./util.js";
 export type Diff = {
     pcMap: number[];
     labels: Map<string, number>;
+    instructions: Instruction[];
 };
 
 export type DiffError =
@@ -40,6 +41,7 @@ export function diff(
     return Result.ok({
         pcMap,
         labels,
+        instructions: modified.instructions,
     });
 }
 
