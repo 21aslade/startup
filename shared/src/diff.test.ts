@@ -2,6 +2,14 @@ import { test, expect } from "@jest/globals";
 import { diff } from "../dist/diff.js";
 import { parseFile, toProgram } from "chasm/parser";
 
+test("from empty", () => {
+    const a = ``;
+    const b = `add r0, r0`;
+    const result = diffFromText(a, b).unwrap();
+    expect(result.labels.size).toBe(0);
+    expect(result.pcMap).toEqual([]);
+});
+
 test("identical", () => {
     const a = `add r0, r0`;
     const result = diffFromText(a, a).unwrap();
@@ -70,6 +78,14 @@ test("reordered instruction", () => {
             b: { type: "register", reg: 1 },
         },
     });
+});
+
+test("empty label", () => {
+    const a = `a:`;
+    const b = `a: \n add r0, r0`;
+    const result = diffFromText(a, b).unwrap();
+    expect(result.labels.size).toBe(0);
+    expect(result.pcMap).toEqual([]);
 });
 
 test("label same pc", () => {
