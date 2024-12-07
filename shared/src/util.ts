@@ -61,6 +61,10 @@ export function* filter<T>(i: Iter<T>, f: (t: T) => boolean): Iter<T> {
     }
 }
 
+export function slice<T>(values: T[], a: number, b: number): Iter<T> {
+    return map(range(a, b), (n) => values[n]);
+}
+
 export function* gaps(i: Iter<number>): Iter<number> {
     let prev = 0;
     for (const pc of i) {

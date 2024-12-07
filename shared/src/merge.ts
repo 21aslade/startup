@@ -1,5 +1,15 @@
 import { Diff } from "./diff.js";
-import { chain, filter, Iter, iterate, map, range, scan, zip } from "./util.js";
+import {
+    chain,
+    filter,
+    Iter,
+    iterate,
+    map,
+    range,
+    scan,
+    slice,
+    zip,
+} from "./util.js";
 import { Instruction } from "chasm/instructions";
 
 export function merge(a: Diff, b: Diff): Diff {
@@ -149,10 +159,6 @@ function* randomMerge(
         yield ["b", bNext.value];
         yield* map(b, (b) => ["b", b]);
     }
-}
-
-function slice<T>(values: T[], a: number, b: number): Iter<T> {
-    return map(range(a, b), (n) => values[n]);
 }
 
 function windows(i: Iter<number>): Iter<[number, number]> {
