@@ -86,5 +86,5 @@ function mergeFromText(o: string, a: string, b: string): Diff {
     const diffA = diff(progO, progA).unwrap();
     const diffB = diff(progO, progB).unwrap();
 
-    return merge(diffA, diffB);
+    return merge(diffA, diffB).origDiff;
 }

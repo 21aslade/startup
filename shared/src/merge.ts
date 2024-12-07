@@ -12,14 +12,22 @@ import {
 } from "./util.js";
 import { Instruction } from "chasm/instructions";
 
-export function merge(a: Diff, b: Diff): Diff {
+export type Merge = {
+    instructionMerge: InstructionMerge;
+    origDiff: Diff;
+};
+
+export function merge(a: Diff, b: Diff): Merge {
     const instructionMerge = mergeFromIter(mergeInstructions(a, b));
     const labels = new Map(mergeLabels(instructionMerge, a, b));
 
     return {
-        pcMap: instructionMerge.origPcMap,
-        instructions: instructionMerge.instructions,
-        labels,
+        instructionMerge,
+        origDiff: {
+            pcMap: instructionMerge.origPcMap,
+            instructions: instructionMerge.instructions,
+            labels,
+        },
     };
 }
 
