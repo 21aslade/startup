@@ -1,25 +1,15 @@
 import { Diff } from "./diff.js";
-import {
-    chain,
-    filter,
-    Iter,
-    iterable,
-    iterate,
-    map,
-    range,
-    scan,
-    zip,
-} from "./util.js";
+import { chain, filter, Iter, iterate, map, range, scan, zip } from "./util.js";
 import { Instruction } from "chasm/instructions";
 
 export function merge(a: Diff, b: Diff): Diff {
     const instructionMerge = mergeFromIter(mergeInstructions(a, b));
-    const labels = new Map(iterable(mergeLabels(instructionMerge, a, b)));
+    const labels = new Map(mergeLabels(instructionMerge, a, b));
 
     return {
         pcMap: instructionMerge.origPcMap,
-        labels,
         instructions: instructionMerge.instructions,
+        labels,
     };
 }
 
@@ -80,12 +70,11 @@ function* mergeInstructions(a: Diff, b: Diff): Iter<[Source, Instruction]> {
 
     const pcMaps = zip(aWindows, bWindows);
 
-    for (let next = pcMaps.next(); !next.done; next = pcMaps.next()) {
-        const [[aPrev, aPc], [bPrev, bPc]] = next.value;
+    for (const [[aPrev, aPc], [bPrev, bPc]] of pcMaps) {
         const aGap = slice(a.instructions, aPrev + 1, aPc);
         const bGap = slice(b.instructions, bPrev + 1, bPc);
 
-        yield* iterable(randomMerge(aGap, bGap));
+        yield* randomMerge(aGap, bGap);
 
         // a and b should have the same instruction at the same point
         yield ["orig", a.instructions[aPc]];
@@ -96,12 +85,12 @@ function* mergeInstructions(a: Diff, b: Diff): Iter<[Source, Instruction]> {
     const lastB = b.pcMap[b.pcMap.length - 1] ?? -1;
     const bRemaining = slice(b.instructions, lastB + 1, b.instructions.length);
 
-    yield* iterable(randomMerge(aRemaining, bRemaining));
+    yield* randomMerge(aRemaining, bRemaining);
 }
 
 type Source = "a" | "b" | "orig";
 
-function mergeFromIter(i: Iterator<[Source, Instruction]>): InstructionMerge {
+function mergeFromIter(i: Iter<[Source, Instruction]>): InstructionMerge {
     let merge: InstructionMerge = {
         instructions: [],
         aPcMap: [],
@@ -109,8 +98,7 @@ function mergeFromIter(i: Iterator<[Source, Instruction]>): InstructionMerge {
         origPcMap: [],
     };
 
-    for (let next = i.next(); !next.done; next = i.next()) {
-        const [source, instruction] = next.value;
+    for (const [source, instruction] of i) {
         addInstruction(merge, instruction, source);
     }
 
@@ -156,10 +144,10 @@ function* randomMerge(
 
     if (!aNext.done) {
         yield ["a", aNext.value];
-        yield* iterable(map(a, (a) => ["a", a]));
+        yield* map(a, (a) => ["a", a]);
     } else if (!bNext.done) {
         yield ["b", bNext.value];
-        yield* iterable(map(b, (b) => ["b", b]));
+        yield* map(b, (b) => ["b", b]);
     }
 }
 

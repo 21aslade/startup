@@ -1,4 +1,5 @@
-export type Iter<T> = Iterator<T, undefined, undefined>;
+export type Iter<T> = Iterator<T, undefined, undefined> &
+    Iterable<T, undefined, undefined>;
 
 export function* zip<A, B>(a: Iter<A>, b: Iter<B>): Iter<[A, B]> {
     let aNext = a.next();
@@ -8,12 +9,6 @@ export function* zip<A, B>(a: Iter<A>, b: Iter<B>): Iter<[A, B]> {
         aNext = a.next();
         bNext = b.next();
     }
-}
-
-export function iterable<T>(i: Iter<T>): Iterable<T, undefined, undefined> {
-    return {
-        [Symbol.iterator]: () => i,
-    };
 }
 
 export function iterate<T>(i: T[]): Iter<T> {
@@ -27,13 +22,13 @@ export function* range(a: number, b: number): Iter<number> {
 }
 
 export function* chain<T>(a: Iter<T>, b: Iter<T>): Iter<T> {
-    yield* iterable(a);
-    yield* iterable(b);
+    yield* a;
+    yield* b;
 }
 
 export function* map<T, U>(i: Iter<T>, f: (t: T) => U): Iter<U> {
-    for (let next = i.next(); !next.done; next = i.next()) {
-        yield f(next.value);
+    for (const t of i) {
+        yield f(t);
     }
 }
 
@@ -42,8 +37,8 @@ export function* scan<A, T, U>(
     f: (a: A, t: T) => [A, U],
     a: A
 ): Iter<U> {
-    for (let next = i.next(); !next.done; next = i.next()) {
-        const result = f(a, next.value);
+    for (const t of i) {
+        const result = f(a, t);
         a = result[0];
         yield result[1];
     }
@@ -51,24 +46,25 @@ export function* scan<A, T, U>(
 
 export function* enumerate<T>(i: Iter<T>): Iter<[number, T]> {
     let n = 0;
-    for (let next = i.next(); !next.done; next = i.next()) {
-        yield [n, next.value];
+    for (const t of i) {
+        yield [n, t];
         n++;
     }
 }
 
+export function filter<T>(i: Iter<T>, f: (t: T) => boolean): Iter<T>;
 export function* filter<T>(i: Iter<T>, f: (t: T) => boolean): Iter<T> {
-    for (let next = i.next(); !next.done; next = i.next()) {
-        if (f(next.value)) {
-            yield next.value;
+    for (const t of i) {
+        if (f(t)) {
+            yield t;
         }
     }
 }
 
 export function* gaps(i: Iter<number>): Iter<number> {
     let prev = 0;
-    for (let pc = i.next(); !pc.done; pc = i.next()) {
-        while (prev < pc.value) {
+    for (const pc of i) {
+        while (prev < pc) {
             yield prev;
             prev++;
         }

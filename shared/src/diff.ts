@@ -2,7 +2,7 @@ import { Program } from "chasm/parser";
 import { Result } from "wombo/result";
 import isEqual from "lodash.isequal";
 import { Instruction } from "chasm/instructions";
-import { enumerate, filter, Iter, iterable } from "./util.js";
+import { enumerate, filter, Iter } from "./util.js";
 
 export type Diff = {
     pcMap: number[];
@@ -36,7 +36,7 @@ export function diff(
     }
 
     const labelIter = newLabels(original.labels, modified.labels);
-    const labels = new Map(iterable(labelIter));
+    const labels = new Map(labelIter);
 
     return Result.ok({
         pcMap,
@@ -83,22 +83,21 @@ function diffInstructions(
     const modIter = enumerate(modified[Symbol.iterator]());
 
     let origNext = origIter.next();
-    while (true) {
-        const modNext = modIter.next();
-        if (origNext.done && modNext.done) {
+    for (const [pc, instruction] of modIter) {
+        if (origNext.done) {
             break;
         }
 
-        if (modNext.done) {
-            const instruction = origNext.value!!;
-            const pc = pcMap.length > 0 ? pcMap[pcMap.length - 1] + 1 : 0;
-            return Result.err([pc, instruction]);
-        }
-
-        if (isEqual(origNext.value, modNext.value[1])) {
-            pcMap.push(modNext.value[0]);
+        if (isEqual(origNext.value, instruction)) {
+            pcMap.push(pc);
             origNext = origIter.next();
         }
+    }
+
+    if (!origNext.done) {
+        const instruction = origNext.value;
+        const pc = pcMap.length > 0 ? pcMap[pcMap.length - 1] + 1 : 0;
+        return Result.err([pc, instruction]);
     }
 
     return Result.ok(pcMap);
