@@ -26,6 +26,11 @@ export function* range(a: number, b: number): Iter<number> {
     }
 }
 
+export function* chain<T>(a: Iter<T>, b: Iter<T>): Iter<T> {
+    yield* iterable(a);
+    yield* iterable(b);
+}
+
 export function* map<T, U>(i: Iter<T>, f: (t: T) => U): Iter<U> {
     for (let next = i.next(); !next.done; next = i.next()) {
         yield f(next.value);

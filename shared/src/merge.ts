@@ -1,11 +1,26 @@
-import { Diff, DiffError } from "./diff.js";
-import { Result } from "wombo/result";
-import { Iter, iterable, iterate, map, range, scan, zip } from "./util.js";
+import { Diff } from "./diff.js";
+import {
+    chain,
+    filter,
+    Iter,
+    iterable,
+    iterate,
+    map,
+    range,
+    scan,
+    zip,
+} from "./util.js";
 import { Instruction } from "chasm/instructions";
 
-export function merge(a: Diff, b: Diff): Result<Diff, DiffError> {
+export function merge(a: Diff, b: Diff): Diff {
     const instructionMerge = mergeFromIter(mergeInstructions(a, b));
-    throw new Error("todo");
+    const labels = new Map(iterable(mergeLabels(instructionMerge, a, b)));
+
+    return {
+        pcMap: instructionMerge.origPcMap,
+        labels,
+        instructions: instructionMerge.instructions,
+    };
 }
 
 type InstructionMerge = {
@@ -14,6 +29,46 @@ type InstructionMerge = {
     bPcMap: number[];
     origPcMap: number[];
 };
+
+function mergeLabels(
+    instructions: InstructionMerge,
+    a: Diff,
+    b: Diff
+): Iter<[string, number]> {
+    const labels = chain(
+        a.labels.keys(),
+        filter(b.labels.keys(), (b) => !a.labels.has(b))
+    );
+
+    return map(labels, (l) => {
+        const aPc = a.labels.get(l);
+        const bPc = b.labels.get(l);
+
+        const progMax = instructions.instructions.length;
+        const [aMin, aMax] =
+            aPc !== undefined
+                ? getRange(aPc, instructions.aPcMap, progMax)
+                : [0, progMax];
+        const [bMin, bMax] =
+            bPc !== undefined
+                ? getRange(bPc, instructions.bPcMap, progMax)
+                : [0, progMax];
+        const max = Math.min(aMax, bMax);
+        const min = Math.max(aMin, bMin);
+
+        return [l, randRange(min, max + 1)];
+    });
+}
+
+function getRange(pc: number, pcMap: number[], len: number): [number, number] {
+    const max = pcMap[pc] ?? len;
+    const min = pc > 0 ? pcMap[pc - 1] + 1 : 0;
+    return [min, max];
+}
+
+function randRange(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
 
 function* mergeInstructions(a: Diff, b: Diff): Iter<[Source, Instruction]> {
     const aWindows = windows(iterate(a.pcMap));
@@ -32,10 +87,10 @@ function* mergeInstructions(a: Diff, b: Diff): Iter<[Source, Instruction]> {
         yield ["orig", a.instructions[aPc]];
     }
 
-    const lastA = a.pcMap[a.pcMap.length - 1];
-    const aRemaining = slice(a.instructions, lastA, a.instructions.length);
-    const lastB = b.pcMap[b.pcMap.length - 1];
-    const bRemaining = slice(b.instructions, lastB, b.instructions.length);
+    const lastA = a.pcMap[a.pcMap.length - 1] ?? -1;
+    const aRemaining = slice(a.instructions, lastA + 1, a.instructions.length);
+    const lastB = b.pcMap[b.pcMap.length - 1] ?? -1;
+    const bRemaining = slice(b.instructions, lastB + 1, b.instructions.length);
 
     yield* iterable(randomMerge(aRemaining, bRemaining));
 }
@@ -96,8 +151,10 @@ function* randomMerge(
     }
 
     if (!aNext.done) {
+        yield ["a", aNext.value];
         yield* iterable(map(a, (a) => ["a", a]));
     } else if (!bNext.done) {
+        yield ["b", bNext.value];
         yield* iterable(map(b, (b) => ["b", b]));
     }
 }
@@ -107,5 +164,5 @@ function slice<T>(values: T[], a: number, b: number): Iter<T> {
 }
 
 function windows(i: Iter<number>): Iter<[number, number]> {
-    return scan(i, (prev, current) => [current, [prev, current]], 0);
+    return scan(i, (prev, current) => [current, [prev, current]], -1);
 }
