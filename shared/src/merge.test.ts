@@ -66,6 +66,18 @@ test("merge labels end", () => {
     expect(result.pcMap).toEqual([]);
 });
 
+test("merge labels one", () => {
+    const o = "hlt";
+    const a = "hlt \n a:";
+    const b = "nop \n hlt";
+
+    const result = mergeFromText(o, a, b);
+    expect(result.instructions.length).toBe(2);
+    expect(result.labels.size).toBe(1);
+    expect(result.labels.get("a")).toBe(2);
+    expect(result.pcMap).toEqual([1]);
+});
+
 function mergeFromText(o: string, a: string, b: string): Diff {
     const progO = parseFile(o).map(toProgram).unwrap();
     const progA = parseFile(a).map(toProgram).unwrap();
