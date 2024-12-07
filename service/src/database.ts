@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { Session, User } from "./user.js";
+import { Session, User } from "linebreak-shared/user";
 
 export type DBConfig = {
     hostname: string;

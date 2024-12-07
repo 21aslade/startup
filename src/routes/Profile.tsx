@@ -1,6 +1,6 @@
 import { friendRequest, getProfile, ServerError } from "../endpoints.js";
 import Friend from "../components/Friend.jsx";
-import type { Profile, Statistics } from "linebreak-service";
+import type { Profile, Statistics } from "linebreak-shared/user";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";

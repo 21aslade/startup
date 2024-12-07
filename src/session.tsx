@@ -1,4 +1,4 @@
-import type { Session } from "linebreak-service";
+import type { Session } from "linebreak-shared/user";
 import {
     createContext,
     PropsWithChildren,

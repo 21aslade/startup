@@ -1,5 +1,5 @@
 import express from "express";
-import { isUserCredentials } from "./user.js";
+import { isUserCredentials } from "linebreak-shared/user";
 import { routeHandler } from "./handler.js";
 import {
     createUser,

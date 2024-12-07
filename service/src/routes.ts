@@ -1,6 +1,6 @@
 import { DataAccess } from "./database.js";
 import { HandlerResponse, RouteException } from "./handler.js";
-import { Profile, Session, User, UserCredentials } from "./user.js";
+import { Profile, Session, User, UserCredentials } from "linebreak-shared/user";
 import { v4 as uuid } from "uuid";
 import * as bcrypt from "bcrypt";
 

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
 import Play from "./routes/Play.jsx";
 import Profile from "./routes/Profile.jsx";
-import { Session, UserCredentials } from "linebreak-service";
+import { Session, UserCredentials } from "linebreak-shared/user";
 import { createUser, getSession, login, logout } from "./endpoints.js";
 import { ProfileRedirect, RequireAuth, SessionProvider } from "./session.jsx";
 import NotFound from "./routes/NotFound.jsx";

@@ -1,7 +1,7 @@
-import { useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { PrimaryButton, SecondaryButton } from "../components/Button.jsx";
 import { styled } from "styled-components";
-import { UserCredentials } from "linebreak-service";
+import { UserCredentials } from "linebreak-shared/user";
 import { ServerError } from "../endpoints.js";
 import ErrorMessage from "../components/ErrorMessage.jsx";
 import { useSession } from "../session.jsx";
@@ -127,12 +127,6 @@ export type HomeProps = {
 
 export default function Home({ onLogin, onLogout }: HomeProps) {
     const session = useSession();
-    useLayoutEffect(() => {
-        const now = Date.now();
-        if (session !== undefined && now > session.expireAt) {
-            onLogout();
-        }
-    }, [session]);
 
     return (
         <Layout>

@@ -4,7 +4,7 @@ import {
     Profile,
     Session,
     UserCredentials,
-} from "linebreak-service";
+} from "linebreak-shared/user";
 
 export async function createUser(
     credentials: UserCredentials
