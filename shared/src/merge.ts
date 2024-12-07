@@ -68,6 +68,9 @@ function labelRange(
 }
 
 function randRange(min: number, max: number) {
+    if (min > max) {
+        return Math.random() > 0.5 ? min : max;
+    }
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
