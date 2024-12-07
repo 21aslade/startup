@@ -45,14 +45,8 @@ function mergeLabels(
         const bPc = b.labels.get(l);
 
         const progMax = instructions.instructions.length;
-        const [aMin, aMax] =
-            aPc !== undefined
-                ? getRange(aPc, instructions.aPcMap, progMax)
-                : [0, progMax];
-        const [bMin, bMax] =
-            bPc !== undefined
-                ? getRange(bPc, instructions.bPcMap, progMax)
-                : [0, progMax];
+        const [aMin, aMax] = labelRange(aPc, instructions.aPcMap, progMax);
+        const [bMin, bMax] = labelRange(bPc, instructions.bPcMap, progMax);
         const max = Math.min(aMax, bMax);
         const min = Math.max(aMin, bMin);
 
@@ -60,7 +54,14 @@ function mergeLabels(
     });
 }
 
-function getRange(pc: number, pcMap: number[], len: number): [number, number] {
+function labelRange(
+    pc: number | undefined,
+    pcMap: number[],
+    len: number
+): [number, number] {
+    if (pc === undefined) {
+        return [0, len];
+    }
     const max = pcMap[pc] ?? len;
     const min = pc > 0 ? pcMap[pc - 1] + 1 : 0;
     return [min, max];
