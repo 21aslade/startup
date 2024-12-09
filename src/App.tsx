@@ -3,7 +3,7 @@ import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import { useCallback, useEffect, useState } from "react";
 import Home from "./routes/Home.jsx";
-import Play from "./routes/Play.jsx";
+import Practice from "./routes/Practice.jsx";
 import Profile from "./routes/Profile.jsx";
 import { Session, UserCredentials } from "linebreak-shared/user";
 import { createUser, getSession, login, logout } from "./endpoints.js";
@@ -69,10 +69,11 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
                     path="/play"
                     element={
                         <RequireAuth backupRoute="/">
-                            <Play />
+                            <Practice />
                         </RequireAuth>
                     }
                 />
+                <Route path="/practice" element={<Practice />} />
             </Routes>
         </SessionProvider>
     );

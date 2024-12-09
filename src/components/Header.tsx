@@ -35,12 +35,15 @@ export default function Header({ username }: { username?: string }) {
                 <NavLink to="/">
                     <img src="/logo.png" width="100px"></img>
                 </NavLink>
-                {username !== undefined ? (
-                    <MainNav>
-                        <NavButton to="/profile">Profile</NavButton>
-                        <NavButton to="/play">Play</NavButton>
-                    </MainNav>
-                ) : undefined}
+                <MainNav>
+                    {username !== undefined ? (
+                        <>
+                            <NavButton to="/profile">Profile</NavButton>
+                            <NavButton to="/play">Play</NavButton>
+                        </>
+                    ) : undefined}
+                    <NavButton to="/practice">Practice</NavButton>
+                </MainNav>
             </Container>
             {username !== undefined ? (
                 <div>

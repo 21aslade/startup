@@ -11,11 +11,11 @@ export type DebuggerCommandName =
     | "play"
     | "pause"
     | "skip"
-    | "skip-back";
+    | "skip-back"
+    | "reload";
 
 export type DebuggerCommand =
     | { type: DebuggerCommandName }
-    | { type: "reload" }
     | { type: "set-breakpoints"; breakpoints: number[] }
     | { type: "load-code"; program: Program };
 
@@ -75,6 +75,8 @@ function dispatchProgramStep(
 ): DebuggerState {
     let result;
     switch (action) {
+        case "reload":
+            return state;
         case "step-in":
             result = step(state, program);
             break;
