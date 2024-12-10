@@ -80,7 +80,7 @@ const B = () => {
             </ul>
             <p>
                 Condition codes are named after their effect when combined with{" "}
-                <code>cmp</code>. For example, if <code>r0 &gt r1</code>, then
+                <code>cmp</code>. For example, if <code>r0 {">"} r1</code>, then
                 after executing <code>cmp r0, r1</code> the instruction{" "}
                 <code>bgt greater</code> would branch (whereas{" "}
                 <code>ble less_or_equal</code> would not).
