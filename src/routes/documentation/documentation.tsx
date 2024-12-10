@@ -13,15 +13,21 @@ export type Doc = {
 };
 
 function getDocs(
-    setCode: (s: string) => void
+    goals?: [string, Doc[]],
+    setCode?: (s: string) => void
 ): [[string, [string, string][]][], Map<string, JSX.Element | string>] {
+    const exampleDocs: [[string, Doc[]]] | undefined = setCode
+        ? [["Examples", examples(setCode)]]
+        : undefined;
+
     const allDocs: [string, Doc[]][] = [
+        ...(goals !== undefined ? [goals] : []),
         ["Basics", basics],
         ["Memory", memory],
         ["Arithmetic", arithmetic],
         ["Control Flow", controlFlow],
         ["Misc", misc],
-        ["Examples", examples(setCode)],
+        ...(exampleDocs ?? []),
     ];
     return [
         allDocs.map(([group, docs]) => [

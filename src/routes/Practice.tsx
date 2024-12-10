@@ -96,7 +96,7 @@ export default function Practice() {
             dispatch({ type: "reload" });
             setCode(code);
         };
-        return getDocs(set);
+        return getDocs(undefined, set);
     }, [setCode, dispatch]);
 
     return (
