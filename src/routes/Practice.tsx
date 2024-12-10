@@ -29,7 +29,7 @@ const processor = initializeProcessor();
 const initialState: DebuggerState = {
     processor,
     undo: [],
-    stepLimit: 20000,
+    stepTotal: 0,
     play: false,
     breakpoints: new Set(),
 };
@@ -116,7 +116,7 @@ export default function Practice() {
                     processor={state.processor}
                     play={state.play}
                     step={state.undo.length}
-                    stepTotal={state.stepLimit}
+                    stepTotal={state.stepTotal}
                     dispatchDebugger={dispatchDebugger}
                     loadCode={loadCode}
                 />

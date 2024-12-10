@@ -39,6 +39,22 @@ const ProcessorWrapper = styled.div`
     justify-content: center;
 `;
 
+const ProgramProgressWrapper = styled.div<{ $hidden: boolean }>`
+    visibility: ${({ $hidden }) => ($hidden ? "hidden" : "visible")};
+    display: flex;
+    flex-direction: column;
+`;
+
+const ProgramProgress = styled.progress`
+    background-color: var(--bg-code);
+    accent-color: #00ff00;
+    border-radius: 100dvh;
+    height: 0.5em;
+    border: 1px solid var(--border);
+    width: 90%;
+    align-self: center;
+`;
+
 export type ProcessorSectionProps = {
     processor: Processor;
     step: number;
@@ -67,10 +83,14 @@ export function ProcessorSection({
                 <h2>Processor Status</h2>
                 <ProcessorDisplay processor={processor} epoch={step} />
                 <h3>PC: {processor.pc}</h3>
-                <h3>
-                    Step: {step} / {stepTotal}
-                </h3>
-                <progress max={stepTotal} value={step} />
+                <ProgramProgressWrapper
+                    $hidden={dispatchDebugger === undefined}
+                >
+                    <h3>
+                        Step: {step} / {stepTotal}
+                    </h3>
+                    <ProgramProgress max={stepTotal} value={step} />
+                </ProgramProgressWrapper>
             </ProcessorWrapper>
             <DebuggerWrapper>
                 <div>

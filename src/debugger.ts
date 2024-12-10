@@ -1,7 +1,16 @@
-import { applyEffect, Effect, invertEffect } from "chasm/effect";
+import {
+    applyEffect,
+    applyEffectCoW,
+    Effect,
+    invertEffect,
+} from "chasm/effect";
 import { Instruction, instructionEffect } from "chasm/instructions";
 import { Program } from "chasm/parser";
-import { initializeProcessor, Processor } from "chasm/processor";
+import {
+    cloneProcessor,
+    initializeProcessor,
+    Processor,
+} from "chasm/processor";
 
 export type DebuggerCommandName =
     | "step-over"
@@ -19,10 +28,12 @@ export type DebuggerCommand =
     | { type: "set-breakpoints"; breakpoints: number[] }
     | { type: "load-code"; program: Program };
 
+const stepLimit = 20000;
+
 export type DebuggerState = {
     processor: Processor;
     undo: Effect[];
-    stepLimit: number;
+    stepTotal: number;
     play: boolean;
     breakpoints: Set<number>;
 };
@@ -35,10 +46,10 @@ export function dispatchState(
         case "reload":
             return [
                 {
-                    processor: initializeProcessor(),
+                    processor: state.processor,
                     undo: [],
                     play: false,
-                    stepLimit: state.stepLimit,
+                    stepTotal: 0,
                     breakpoints: new Set(),
                 },
                 undefined,
@@ -54,8 +65,11 @@ export function dispatchState(
             } else {
                 return [state, program];
             }
-        case "load-code":
-            return [state, action.program];
+        case "load-code": {
+            const stepTotal = countSteps(action.program);
+            const processor = initializeProcessor();
+            return [{ ...state, processor, stepTotal }, action.program];
+        }
         default:
             if (program !== undefined) {
                 return [
@@ -81,10 +95,10 @@ function dispatchProgramStep(
             result = step(state, program);
             break;
         case "step-over":
-            result = stepOver(state, program);
+            result = applyToClone(stepOver, state, program);
             break;
         case "step-out":
-            result = stepOut(state, program);
+            result = applyToClone(stepOut, state, program);
             break;
         case "step-back":
             result = unstep(state);
@@ -101,19 +115,77 @@ function dispatchProgramStep(
             break;
     }
 
-    if (result.breakpoints.has(result.processor.pc)) {
+    if (
+        result.breakpoints.has(result.processor.pc) ||
+        !canMoveForward(program, state.processor, state.undo)
+    ) {
         return { ...result, play: false };
     } else {
         return result;
     }
 }
 
-function canMoveForward(state: DebuggerState, program: Program): boolean {
+function applyToClone(
+    f: (
+        program: Program,
+        processor: Processor,
+        undo: Effect[],
+        breakpoints: Set<number>
+    ) => void,
+    state: DebuggerState,
+    program: Program
+): DebuggerState {
+    const processor = cloneProcessor(state.processor);
+    const undo = [...state.undo];
+    const breakpoints = state.breakpoints;
+
+    f(program, processor, undo, breakpoints);
+
+    return { ...state, processor, undo };
+}
+
+function countSteps(program: Program): number {
+    let stepCount = 0;
+
+    const effects: Effect[] = [];
+    const processor = initializeProcessor();
+    const labels = program.labels;
+
+    while (
+        canMoveForward(program, processor, effects) &&
+        stepCount < stepLimit
+    ) {
+        const instruction = program.instructions[processor.pc];
+        const effect = instructionEffect(processor, labels, instruction);
+        applyEffect(processor, effect);
+        stepCount++;
+    }
+
+    return stepCount;
+}
+
+function canMoveForward(
+    program: Program,
+    processor: Processor,
+    undo: Effect[]
+): boolean {
     return (
-        !state.processor.halted &&
-        state.processor.pc < program.instructions.length &&
-        state.undo.length < state.stepLimit
+        !processor.halted &&
+        processor.pc < program.instructions.length &&
+        undo.length < stepLimit
     );
+}
+
+function runInPlace(
+    processor: Processor,
+    undo: Effect[],
+    labels: Map<string, number>,
+    instruction: Instruction
+) {
+    const effect = instructionEffect(processor, labels, instruction);
+    const inverse = invertEffect(processor, effect);
+    applyEffect(processor, effect);
+    undo.push(inverse);
 }
 
 function runInstruction(
@@ -127,7 +199,7 @@ function runInstruction(
         instruction
     );
     const inverse = invertEffect(state.processor, effect);
-    const processor = applyEffect(state.processor, effect);
+    const processor = applyEffectCoW(state.processor, effect);
     const undo = [...state.undo, inverse];
 
     return {
@@ -138,80 +210,94 @@ function runInstruction(
 }
 
 function skipForward(state: DebuggerState, program: Program): DebuggerState {
+    const processor = cloneProcessor(state.processor);
+    const undo = [...state.undo];
+    const labels = program.labels;
+
     let run = false;
     while (
-        canMoveForward(state, program) &&
-        (!run || !state.breakpoints.has(state.processor.pc))
+        canMoveForward(program, processor, undo) &&
+        (!run || !state.breakpoints.has(processor.pc))
     ) {
+        const instruction = program.instructions[processor.pc];
+        runInPlace(processor, undo, labels, instruction);
         run = true;
-        state = step(state, program);
     }
 
-    return { ...state, play: false };
+    return { ...state, processor, undo, play: false };
 }
 
 function skipBack(state: DebuggerState): DebuggerState {
+    const processor = cloneProcessor(state.processor);
+    const undo = [...state.undo];
+
     let run = false;
-    while (
-        state.undo.length > 0 &&
-        (!run || !state.breakpoints.has(state.processor.pc))
-    ) {
+    while (undo.length > 0 && (!run || !state.breakpoints.has(processor.pc))) {
+        unstepInPlace(processor, undo);
         run = true;
-        state = unstep(state);
     }
 
-    return { ...state, play: false };
+    return { ...state, processor, undo, play: false };
 }
 
 function step(state: DebuggerState, program: Program): DebuggerState {
-    if (!canMoveForward(state, program)) {
+    if (!canMoveForward(program, state.processor, state.undo)) {
         return { ...state, play: false };
     }
     const instruction = program.instructions[state.processor.pc];
     return runInstruction(state, program, instruction);
 }
 
-function stepOut(state: DebuggerState, program: Program): DebuggerState {
-    if (!canMoveForward(state, program)) {
-        return { ...state, play: false };
+function stepOut(
+    program: Program,
+    processor: Processor,
+    undo: Effect[],
+    breakpoints: Set<number>
+) {
+    if (!canMoveForward(program, processor, undo)) {
+        return;
     }
 
-    if (state.processor.callStack.length === 0) {
-        return step(state, program);
+    const labels = program.labels;
+
+    if (processor.callStack.length === 0) {
+        const instruction = program.instructions[processor.pc];
+        runInPlace(processor, undo, labels, instruction);
+        return;
     }
 
     let instruction;
     do {
-        instruction = program.instructions[state.processor.pc];
+        instruction = program.instructions[processor.pc];
         if (instruction.op === "call") {
-            state = stepOver(state, program);
+            stepOver(program, processor, undo, breakpoints);
         } else {
-            state = runInstruction(state, program, instruction);
+            runInPlace(processor, undo, labels, instruction);
         }
     } while (
         instruction.op !== "ret" &&
-        canMoveForward(state, program) &&
-        !state.breakpoints.has(state.processor.pc)
+        canMoveForward(program, processor, undo) &&
+        !breakpoints.has(processor.pc)
     );
-
-    return state;
 }
 
-function stepOver(state: DebuggerState, program: Program): DebuggerState {
-    if (!canMoveForward(state, program)) {
-        return { ...state, play: false };
+function stepOver(
+    program: Program,
+    processor: Processor,
+    undo: Effect[],
+    breakpoints: Set<number>
+) {
+    if (!canMoveForward(program, processor, undo)) {
+        return;
     }
 
-    let instruction = program.instructions[state.processor.pc];
-    const resultState = runInstruction(state, program, instruction);
-    if (
-        instruction.op !== "call" ||
-        state.breakpoints.has(state.processor.pc)
-    ) {
-        return resultState;
+    const instruction = program.instructions[processor.pc];
+    runInPlace(processor, undo, program.labels, instruction);
+    if (instruction.op !== "call" || breakpoints.has(processor.pc)) {
+        return;
     }
 
-    return stepOut(resultState, program);
+    stepOut(program, processor, undo, breakpoints);
 }
 
 function unstep(state: DebuggerState): DebuggerState {
@@ -220,10 +306,14 @@ function unstep(state: DebuggerState): DebuggerState {
         return state;
     }
 
-    const processor = applyEffect(state.processor, effect);
+    const processor = applyEffectCoW(state.processor, effect);
     return {
         ...state,
         processor,
         undo: state.undo.slice(0, -1),
     };
+}
+
+function unstepInPlace(processor: Processor, undo: Effect[]) {
+    applyEffect(processor, undo.pop() ?? {});
 }
