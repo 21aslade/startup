@@ -9,6 +9,7 @@ import { Session, UserCredentials } from "linebreak-shared/user";
 import { createUser, getSession, login, logout } from "./endpoints.js";
 import { ProfileRedirect, RequireAuth, SessionProvider } from "./session.jsx";
 import NotFound from "./routes/NotFound.jsx";
+import Play from "./routes/Play.jsx";
 
 export default function App() {
     const [session, setSession] = useState<Session | undefined | null>();
@@ -69,7 +70,7 @@ function AppRoutes({ session, setSession }: AppRoutesProps) {
                     path="/play"
                     element={
                         <RequireAuth backupRoute="/">
-                            <Practice />
+                            <Play />
                         </RequireAuth>
                     }
                 />
