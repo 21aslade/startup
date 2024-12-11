@@ -14,6 +14,7 @@ import {
 import { initializeDBClient, isDBConfig } from "./database.js";
 import * as fs from "node:fs/promises";
 import cookieParser from "cookie-parser";
+import { addWsListener } from "./ws.js";
 
 const dbConfig = JSON.parse(
     await fs.readFile("dbConfig.json", { encoding: "utf-8" })
@@ -25,7 +26,9 @@ if (!isDBConfig(dbConfig)) {
     );
 }
 
+console.log("[service] initialize db");
 const data = await initializeDBClient(dbConfig);
+console.log("[service] initialized db");
 
 const app = express();
 
@@ -36,6 +39,8 @@ app.use(cookieParser());
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
 app.use(express.static("public"));
+
+app.set("trust proxy", true);
 
 const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
@@ -88,9 +93,11 @@ app.use((_req, res) => {
     res.sendFile("index.html", { root: "public" });
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
+
+addWsListener(server, data);
 
 function isUnk(o: unknown): o is unknown {
     return true;

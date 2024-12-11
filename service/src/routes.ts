@@ -166,9 +166,9 @@ async function createSession(
     };
 }
 
-async function requireAuth(
+export async function requireAuth(
     data: DataAccess,
-    cookies: Record<string, string>
+    cookies: Record<string, string | undefined>
 ): Promise<Session> {
     const token = cookies[authCookieKey];
     if (token === undefined) {
