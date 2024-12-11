@@ -44,7 +44,6 @@ export function addWsListener(httpServer: Server, data: DataAccess) {
             const cookies = cookie.parse(req.headers["cookie"] ?? "");
             const { username } = await requireAuth(data, cookies);
             addConnection(ws, username);
-            ws.send(JSON.stringify({}));
         } catch (e: unknown) {
             if (e instanceof RouteException) {
                 console.error("Closed connection!");
@@ -93,6 +92,9 @@ function addConnection(ws: WebSocket, username: string) {
     ws.on("pong", () => {
         connection.alive = true;
     });
+
+    const gameData = [...getGameData()];
+    ws.send(JSON.stringify({ games: gameData }));
 }
 
 function handleLobbyMessage(
@@ -115,11 +117,7 @@ function handleLobbyMessage(
         (v) => v.state.state === "lobby"
     );
 
-    const gameData: Iter<GameData> = map(games.entries(), ([id, game]) => ({
-        gameId: id,
-        opponent: game.playerOne.username,
-        goal: game.goal,
-    }));
+    const gameData: Iter<GameData> = getGameData();
     sendAll(lobby, { games: [...gameData] });
 
     games.set(id, { playerOne: connection, goal });
@@ -129,6 +127,14 @@ function handleLobbyMessage(
         gameId: id,
     };
     ws.send(JSON.stringify(game));
+}
+
+function getGameData(): Iter<GameData> {
+    return map(games.entries(), ([id, game]) => ({
+        gameId: id,
+        opponent: game.playerOne.username,
+        goal: game.goal,
+    }));
 }
 
 setInterval(() => {
