@@ -105,6 +105,18 @@ For this deliverable I hooked the login system up to the database and switched t
 
 (All this stuff was done today, cause there wasn't too much to do!)
 
+## Startup WebSocket
+
+For this deliverable, I used WebSocket to allow joining games. Unfortunately, I'm still a few hours out from it being fully functional!
+I plan on adding the complete functionality after the due date. Currently, after joining a game, it shows a blank screen.
+If you're grading in the future and see that you can actually play, that's awesome! Give or give not the points at your discretion.
+
+-   [x] **Backend listens for WebSocket connection** - done!
+-   [x] **Frontend makes WebSocket connection** - done!
+-   [x] **Data sent over WebSocket connection** - done!
+-   [x] **WebSocket data displayed** - When you create a game, other users can see that game!
+-   [ ] **All visible elements are working** - Even though almost everything is implemented, I did not have time to make the game actually function.
+
 ## Dependencies
 
 I use a number of dependencies in this project; I wrote some of them, but others are external:
