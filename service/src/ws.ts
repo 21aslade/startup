@@ -89,8 +89,8 @@ function addConnection(ws: WebSocket, username: string) {
         connection.alive = true;
     });
 
-    const gameData = [...gameList()];
-    ws.send(JSON.stringify({ games: gameData }));
+    const gameData = [...gameList(games.entries())];
+    ws.send(JSON.stringify({ type: "game-list", games: gameData }));
 }
 
 function handleLobbyMessage(
@@ -116,22 +116,15 @@ function handleCreateGame(goal: string, connection: Connection, ws: WebSocket) {
     const id = uuid();
 
     connection.state = { state: "game", gameId: id };
-
-    const lobby = filter(
-        connections.values(),
-        (v) => v.state.state === "lobby"
-    );
-
-    const gameData: Iter<GameData> = gameList();
-    sendAll(lobby, { games: [...gameData] });
-
     games.set(id, { playerOne: connection, goal });
+
+    notifyGameUpdate(connections.values(), games.entries());
 
     const game: GameData = {
         goal: chosenGoal,
         gameId: id,
     };
-    ws.send(JSON.stringify(game));
+    ws.send(JSON.stringify({ type: "game", game }));
 }
 
 function handleJoinGame(gameId: string, connection: Connection, ws: WebSocket) {
@@ -151,16 +144,37 @@ function handleJoinGame(gameId: string, connection: Connection, ws: WebSocket) {
 
     connection.state = { state: "game", gameId };
     game.playerTwo = connection;
+
+    notifyGameUpdate(connections.values(), games.entries());
+
+    const gameData = toGameData(gameId, game);
+    const message = JSON.stringify({ type: "start", game: gameData });
+    game.playerOne.ws.send(message);
+    game.playerTwo.ws.send(message);
 }
 
-function gameList(): Iter<GameData> {
+function notifyGameUpdate(
+    connections: Iter<Connection>,
+    games: Iter<[string, GameConnections]>
+) {
+    const lobby = filter(connections, (v) => v.state.state === "lobby");
+
+    const gameData: Iter<GameData> = gameList(games);
+    sendAll(lobby, { games: [...gameData] });
+}
+
+function toGameData(id: string, game: GameConnections) {
+    return {
+        gameId: id,
+        opponent: game.playerOne.username,
+        goal: game.goal,
+    };
+}
+
+function gameList(games: Iter<[string, GameConnections]>): Iter<GameData> {
     return map(
-        filter(games.entries(), ([_, g]) => g.playerTwo === undefined),
-        ([id, game]) => ({
-            gameId: id,
-            opponent: game.playerOne.username,
-            goal: game.goal,
-        })
+        filter(games, ([_, g]) => g.playerTwo === undefined),
+        ([id, game]) => toGameData(id, game)
     );
 }
 

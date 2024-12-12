@@ -14,6 +14,11 @@ export type LobbyMessage =
           id: string;
       };
 
+export type LobbyResponse =
+    | { type: "game"; game: GameData }
+    | { type: "start"; game: GameData }
+    | { type: "game-list"; games: GameData[] };
+
 export function isGameData(d: unknown): d is GameData {
     return (
         typeof d === "object" &&
@@ -26,7 +31,7 @@ export function isGameData(d: unknown): d is GameData {
 }
 
 export function isLobbyMessage(r: unknown): r is LobbyMessage {
-    if (typeof r === "object" || r === null) {
+    if (typeof r !== "object" || r === null) {
         return false;
     }
 
@@ -38,5 +43,24 @@ export function isLobbyMessage(r: unknown): r is LobbyMessage {
             return typeof request.id === "string";
         default:
             return false;
+    }
+}
+
+export function isLobbyResponse(r: unknown): r is LobbyResponse {
+    if (typeof r !== "object" || r === null) {
+        return false;
+    }
+
+    const response = r as LobbyResponse;
+    switch (response.type) {
+        case "game":
+            return isGameData(response.game);
+        case "start":
+            return isGameData(response.game);
+        case "game-list":
+            return (
+                Array.isArray(response.games) &&
+                response.games.every(isGameData)
+            );
     }
 }
