@@ -160,7 +160,7 @@ function notifyGameUpdate(
     const lobby = filter(connections, (v) => v.state.state === "lobby");
 
     const gameData: Iter<GameData> = gameList(games);
-    sendAll(lobby, { games: [...gameData] });
+    sendAll(lobby, { type: "game-list", games: [...gameData] });
 }
 
 function toGameData(id: string, game: GameConnections) {
