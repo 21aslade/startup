@@ -21,10 +21,12 @@ rm -rf build
 mkdir build
 npm install # make sure vite is installed so that we can bundle
 npm run build # build the React front end
-(cd service && npx tsc)
+(cd service && npm run build-fast) & (cd shared && npx tsc)
 cp -rf dist build/public # move the React front end to the target distribution
 cp service/dist/*.js build # move the back end service to the target distribution
 cp service/*.json build
+mkdir build/shared
+cp -r shared build/shared
 
 # Step 2
 printf "\n----> Clearing out previous distribution on the target\n"
@@ -43,6 +45,8 @@ ssh -i "$key" ubuntu@$hostname << ENDSSH
 bash -i
 cd services/${service}
 npm install --omit=dev
+rm node_modules/linebreak-shared
+mv shared/** node_modules/linebreak-shared
 pm2 restart ${service}
 ENDSSH
 
