@@ -6,11 +6,7 @@ import { RouteException } from "./handler.js";
 import { requireAuth } from "./routes.js";
 import { DataAccess } from "./database.js";
 import cookie from "cookie";
-import {
-    GameData,
-    CreateGameRequest,
-    isCreateGameRequest,
-} from "linebreak-shared/game";
+import { GameData, LobbyMessage, isLobbyMessage } from "linebreak-shared/game";
 import { filter, Iter, map } from "linebreak-shared/util";
 
 type ConnectionState =
@@ -93,7 +89,7 @@ function addConnection(ws: WebSocket, username: string) {
         connection.alive = true;
     });
 
-    const gameData = [...getGameData()];
+    const gameData = [...gameList()];
     ws.send(JSON.stringify({ games: gameData }));
 }
 
@@ -103,11 +99,20 @@ function handleLobbyMessage(
     ws: WebSocket
 ) {
     const message = JSON.parse(data.toString());
-    if (!isCreateGameRequest(message)) {
+    if (!isLobbyMessage(message)) {
         throw new RouteException(400, "Bad request");
     }
 
-    const goal = message.goal === "random" ? "4" : message.goal;
+    switch (message.type) {
+        case "create":
+            return handleCreateGame(message.goal, connection, ws);
+        case "join":
+            return handleJoinGame(message.id, connection, ws);
+    }
+}
+
+function handleCreateGame(goal: string, connection: Connection, ws: WebSocket) {
+    const chosenGoal = goal === "random" ? "4" : goal;
     const id = uuid();
 
     connection.state = { state: "game", gameId: id };
@@ -117,24 +122,46 @@ function handleLobbyMessage(
         (v) => v.state.state === "lobby"
     );
 
-    const gameData: Iter<GameData> = getGameData();
+    const gameData: Iter<GameData> = gameList();
     sendAll(lobby, { games: [...gameData] });
 
     games.set(id, { playerOne: connection, goal });
 
     const game: GameData = {
-        goal,
+        goal: chosenGoal,
         gameId: id,
     };
     ws.send(JSON.stringify(game));
 }
 
-function getGameData(): Iter<GameData> {
-    return map(games.entries(), ([id, game]) => ({
-        gameId: id,
-        opponent: game.playerOne.username,
-        goal: game.goal,
-    }));
+function handleJoinGame(gameId: string, connection: Connection, ws: WebSocket) {
+    const game = games.get(gameId);
+    if (game === undefined) {
+        throw new RouteException(404, "Game not found");
+    }
+
+    const playerOne = game.playerOne;
+    if (playerOne.username === connection.username) {
+        throw new RouteException(400, "Cannot join as both players");
+    }
+
+    if (game.playerTwo !== undefined) {
+        throw new RouteException(403, "Already taken");
+    }
+
+    connection.state = { state: "game", gameId };
+    game.playerTwo = connection;
+}
+
+function gameList(): Iter<GameData> {
+    return map(
+        filter(games.entries(), ([_, g]) => g.playerTwo === undefined),
+        ([id, game]) => ({
+            gameId: id,
+            opponent: game.playerOne.username,
+            goal: game.goal,
+        })
+    );
 }
 
 setInterval(() => {
